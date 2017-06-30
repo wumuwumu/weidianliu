@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll_ll">
+
+        <ImageView
+            android:id="@+id/img_head"
+            android:layout_width="160dp"
+            android:layout_height="420dp"
+            android:src="@drawable/human_left" />
+
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="160dp"
+            android:layout_height="420dp"
+            android:src="@drawable/human_right" />
+
+    </LinearLayout>
+
+    <!--arm-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_arm"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="110dp"
+        android:layout_marginLeft="20dp"
+        android:alpha="100"/>
+
+    <!--shoudler-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_shoudler"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="45dp"
+        android:alpha="100"/>
+
+    <!--chest-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_chest"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="95dp"
+        android:layout_marginLeft="70dp"
+        android:alpha="100"/>
+
+    <!--abdomen-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_abdomen"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="150dp"
+        android:layout_marginLeft="90dp"
+        android:alpha="100"/>
+
+    <!--back-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_back"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="90dp"
+        android:layout_marginLeft="240dp"
+        android:alpha="100"/>
+
+    <!--waist-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_waist"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="150dp"
+        android:layout_marginLeft="230dp"
+        android:alpha="100"/>
+
+    <!--thigh_fore-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_hgigh_fore"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="230dp"
+        android:layout_marginLeft="55dp"
+        android:alpha="100"/>
+    <!--thigh_back-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_hgigh_back"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="230dp"
+        android:layout_marginLeft="250dp"
+        android:alpha="100"/>
+    <!--hips-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_hips"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="185dp"
+        android:layout_marginLeft="250dp"
+        android:alpha="100"/>
+
+    <!--calf-->
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/gif_calf"
+        android:src="@drawable/gif_dot"
+        android:layout_marginTop="320dp"
+        android:layout_marginLeft="260dp"
+        android:alpha="100"/>
+</RelativeLayout>
+

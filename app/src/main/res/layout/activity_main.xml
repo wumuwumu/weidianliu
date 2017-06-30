@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context="com.sciento.wumu.weidianliu.activity.MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="总时间剩余：0min"
+        android:id="@+id/tv_alltime_remain"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/progressBar"
+        app:layout_constraintRight_toRightOf="@+id/progressBar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.521" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_resttime_remain"
+        android:textColor="@color/white"
+        android:text="运动剩余时间：60s"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="@+id/progressBar"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="0.89" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/progress_layerlist"
+        android:layout_width="758dp"
+        android:layout_height="25dp"
+        android:progress="60"
+        android:max="70"
+        android:paddingRight="40dp"
+        android:paddingLeft="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="0.013"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintVertical_bias="0.050000012" />
+
+
+    <LinearLayout
+        android:id="@+id/all_left"
+        android:layout_width="wrap_content"
+        android:layout_height="550dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.01"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <!--left  arm-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/llo_arm_left">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_arm_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_arm"
+                style="@style/circleprogress"
+                android:layout_gravity="center"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line"
+
+                />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_arm_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:text="胳膊" />
+
+        <!--left  shoulder-->
+        <LinearLayout
+            android:id="@+id/llo_shoudler_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_shoulder_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_shoudler"
+                style="@style/circleprogress"
+                android:layout_gravity="center"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_shoulder_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:text="肩膀" />
+
+        <!--chest-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_chest_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_chest"
+                style="@style/circleprogress"
+                android:layout_gravity="center"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_chest_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:text="胸部" />
+
+        <!--abdomen left-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_abdomen_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_abdomen"
+                style="@style/circleprogress"
+                android:layout_gravity="center"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_abdomen_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:text="腹部" />
+
+        <!--back left-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_back_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_back"
+                style="@style/circleprogress"
+                android:layout_gravity="center"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_back_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:text="背部" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/all_right"
+        android:layout_width="wrap_content"
+        android:layout_height="550dp"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toRightOf="@+id/all_left"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.75">
+
+        <!--waist right-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_waist_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_waist"
+                style="@style/circleprogress"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_waist_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:text="腰部" />
+
+        <!--forethigh right-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_forethigh_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_forethigh"
+                style="@style/circleprogress"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_forethigh_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:text="大腿前侧" />
+
+        <!--backthigh right-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            >
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_backthigh_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_backthigh"
+                style="@style/circleprogress"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_backthigh_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:text="大腿后侧" />
+
+        <!--hips right-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_hips_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_hips"
+                style="@style/circleprogress"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_hips_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:text="臀部" />
+
+        <!--calf right-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_calfs_minus"
+                style="@style/imagebuttonstyle_left_minus" />
+
+            <com.dinuscxj.progressbar.CircleProgressBar
+                android:id="@+id/cirpro_calfs"
+                style="@style/circleprogress"
+                app:line_count="30"
+                app:line_width="4dp"
+                app:progress_background_color="@color/holo_darker_gray"
+                app:progress_end_color="@color/circleprocolor"
+                app:progress_shader="sweep"
+                app:progress_start_color="@color/circleprocolor"
+                app:progress_stroke_cap="round"
+                app:progress_stroke_width="4dp"
+                app:progress_text_color="@color/circleprocolor"
+                app:style="solid_line" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_calfs_plus"
+                style="@style/imagebuttonstyle_left_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:text="小腿" />
+    </LinearLayout>
+
+    <!--image -->
+    <include layout="@layout/layout_man"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintLeft_toRightOf="@+id/all_left"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintRight_toLeftOf="@+id/all_right"
+        android:layout_marginRight="8dp"
+        android:id="@+id/include"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintVertical_bias="0.100000024" />
+
+    <LinearLayout
+        android:id="@+id/llo_all_controller"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/all_left"
+        app:layout_constraintRight_toLeftOf="@+id/all_right"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/include">
+
+        <com.sciento.wumu.weidianliu.view.LongClickButton
+            android:id="@+id/imgbtn_all_minus"
+            android:layout_width="30dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/footer_subtract" />
+
+        <Button
+            android:id="@+id/imgbtn_all_show"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/right_base"
+            android:text="0"
+            android:textColor="@color/white" />
+
+        <com.sciento.wumu.weidianliu.view.LongClickButton
+            android:id="@+id/imgbtn_all_add"
+            android:layout_width="30dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/footer_add" />
+
+    </LinearLayout>
+
+    <!--text time-->
+    <LinearLayout
+        android:id="@+id/llo_time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="350dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/llo_time"
+        android:layout_marginRight="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/all_right"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintHorizontal_bias="0.708"
+        app:layout_constraintVertical_bias="0.499"
+        app:layout_constraintTop_toBottomOf="@+id/llo_mode">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/string_alltime"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/string_train_time"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/string_rest_time"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <!--time-->
+    <LinearLayout
+        android:id="@+id/llo_time"
+        android:layout_width="wrap_content"
+        android:layout_height="350dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llo_mode"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/all_right"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintHorizontal_bias="0.72">
+
+        <!--time 1-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_time_all_minus"
+                style="@style/time_controler_minus" />
+
+            <Button style="@style/time_show"
+                android:id="@+id/btn_controler_show"/>
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_time_all_add"
+                style="@style/time_controler_add" />
+        </LinearLayout>
+        <!--time 2-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:weightSum="1">
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_time_train_minus"
+                style="@style/time_controler_minus" />
+
+            <Button style="@style/time_show"
+                android:id="@+id/btn_train_show"
+                android:layout_weight="21" />
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_time_train_add"
+                style="@style/time_controler_add" />
+        </LinearLayout>
+        <!--time 3-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_time_rest_minus"
+                style="@style/time_controler_minus" />
+
+            <Button style="@style/time_show"
+                android:id="@+id/btn_rest_show"/>
+
+            <com.sciento.wumu.weidianliu.view.LongClickButton
+                android:id="@+id/btn_time_rest_add"
+                style="@style/time_controler_add" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <!--mode -->
+    <LinearLayout
+        android:id="@+id/llo_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintLeft_toRightOf="@+id/progressBar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.01999998"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/string_mode_aerobic"
+            android:textColor="@color/white"
+            android:layout_gravity="center"/>
+
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center">
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_aerobic"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_aerobic"/>
+        </FrameLayout>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/string_mode_anoxic"
+            android:textColor="@color/white"
+            android:layout_gravity="center" />
+
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center">
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_anoxic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_anoxic"/>
+        </FrameLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/string_mode_massage"
+            android:textColor="@color/white"
+            android:layout_gravity="center"/>
+
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center">
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_massage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/tv_massage"/>
+        </FrameLayout>
+
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintVertical_bias="0.07999998"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_blu_text"
+            android:textColor="@color/white"
+            android:text="@string/string_blu_dis"/>
+        <Button
+            android:id="@+id/btn_blu"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/btn_blu_nor"/>
+    </LinearLayout>
+
+
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/btn_start"
+        android:background="@drawable/btn_start_dis"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/all_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/llo_time"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintVertical_bias="0.459"
+        app:layout_constraintHorizontal_bias="0.49" />
+
+
+
+</android.support.constraint.ConstraintLayout>

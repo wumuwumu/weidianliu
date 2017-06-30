@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <item>
+        <shape
+            android:shape="rectangle"
+            >
+            <!--圆角-->
+            <corners android:radius="5dp" />
+            <!--填充颜色-->
+            <solid android:color="@color/circleprocolor" />
+            <size
+                android:width="10dp"
+                android:height="25dp"/>
+
+                />
+
+        </shape>
+    </item>
+
+
+    <item android:left="20dp">
+        <shape
+            android:shape="rectangle">
+            <!--圆角-->
+            <corners android:radius="5dp" />
+            <!--填充颜色-->
+            <solid android:color="#FFFFFF" />
+            <size
+                android:width="10dp"
+                android:height="25dp"/>
+        </shape>
+    </item>
+
+
+</layer-list>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">微电流</string>
+    
+    <string name="string_alltime">总时间</string>
+    <string name="string_train_time">运动时间</string>
+    <string name="string_rest_time">休息时间</string>
+
+    <string name="string_mode_aerobic">有氧模式</string>
+    <string name="string_mode_anoxic">无氧模式</string>
+    <string name="string_mode_massage">按摩模式</string>
+
+    <string name="string_blu_dis">未连接</string>
+    <string name="string_blu_en">已连接</string>
+    <string name="string_blue_ing">连接中</string>
+
+    <string name="error_bluetooth_not_supported">您的手机不支持蓝牙功能</string>
+    <string name="ble_not_supported">您的手机不支持蓝牙功能</string>
+</resources>
