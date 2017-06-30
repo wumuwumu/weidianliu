@@ -1,5 +1,7 @@
 package com.sciento.wumu.weidianliu.activity;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -16,6 +18,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -213,10 +216,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF3-0000-1000-8000-00805f9b34fb");
 
     //显示值
-    int[] mEveryRank = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50};
-    int mAllRank = 50;
+    int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int mAllRank = 0;
     //timer
-    int[] mTimerShow = {15, 10, 5};
+    int[] mTimerShow = {5, 5, 5};
 
     //mode
     int modeSelect = 1;
@@ -226,6 +229,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     int mallRankCopy = 0;
 
+    //animator
+    final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
+    int mstart =0;
+    int mstop = 0;
+    int mratio = 0;
+    int alltime =0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         RequestPermissonUtil.mayRequestLocation(this);
@@ -552,15 +561,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 case MSG_GET_DATE:
                     Bundle myBundle = msg.getData();
                     byte[] mbyte = myBundle.getByteArray("datearray");
-                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
-
-                    if (mbyte[4] > 0) {
-                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
-                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
-                    } else {
-                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
-                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
-                    }
+//                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
+//
+//                    if (mbyte[4] > 0) {
+//                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
+//                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
+//                    } else {
+//                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
+//                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
+//                    }
                     //Toast.makeText(MainActivity.this,""+mbyte[2],Toast.LENGTH_SHORT).show();
             }
         }
@@ -621,10 +630,114 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.btn_start:
                 if (!start_en) {
                     //sendCurrentSignal();
-                    sendTimer();
+                    mratio = (int)(200*3f/(mTimerShow[1]+mTimerShow[2]));
+                     mstart= (int)(200.0f*mTimerShow[1]/(mTimerShow[1]+mTimerShow[2]));
+                     mstop = 200-mstart;
+                    //animator.end();
+                    animator.cancel();
+                    alltime = mTimerShow[0]*60;
+                    tvAlltimeRemain.setText("总剩余时间：" + mTimerShow[0]+"min");
+                    animator.setDuration((mTimerShow[1]+mTimerShow[2])*1000);
+//                    animator.setDuration(6000);
+                    animator.setRepeatCount((int)(mTimerShow[0]*60.0f/(mTimerShow[1]+mTimerShow[2])));
+                    animator.setInterpolator(new LinearInterpolator());
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            int integer = (int) animator.getAnimatedValue();
+                            //cirproArm.setProgress(integer/2);
+//                            if(integer == 160)
+//                            {
+////                                alltime =alltime - (mTimerShow[1]+mTimerShow[2]);
+//                                alltime =alltime - 1;
+//                                Toast.makeText(MainActivity.this,""+alltime,Toast.LENGTH_SHORT).show();
+//                                tvAlltimeRemain.setText("总剩余时间：" + alltime/60+ "///"+alltime+"///"+animator.+"min");
+//                            }
+//                            tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1]-(int)(integer/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
+//                            Toast.makeText(MainActivity.this,""+integer,Toast.LENGTH_SHORT).show();
+
+                            if(integer<mstart) {
+                                progressBar.setProgress((int)(integer*70.0f/mstart));
+                                tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1]-(int)(integer/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
+                                if(integer%mratio == 0 || integer== mstart-2){
+                                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                        "FE"
+                                                + "01"
+                                                + "01"
+                                                + String.format("%02x", mTimerShow[0])
+                                                + String.format("%02x", mTimerShow[1])
+                                                + String.format("%02x", mTimerShow[2])
+                                                + "0" + modeSelect
+                                                + "00"
+                                                + "00"
+                                                + "00"
+                                                + "00"
+                                                + "00"
+                                                + "EF"
+                                );
+                                }
+
+//                                progressBar.setProgress(integer);
+                            }else {
+                                progressBar.setProgress((int)((200-integer)*70.0f/mstop));
+                                tvResttimeRemain.setText("休息剩余时间" + ((int)((200-integer)/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
+                                if(integer%mratio == 0 || integer==198) {
+                                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                            "FE"
+                                                    + "01"
+                                                    + "00"
+                                                    + String.format("%02x", mTimerShow[0])
+                                                    + String.format("%02x", mTimerShow[1])
+                                                    + String.format("%02x", mTimerShow[2])
+                                                    + "0" + modeSelect
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "EF"
+                                    );
+                                }
+                            }
+
+
+                           // progressBar.setProgress(integer);
+                        }
+                    });
+
+                    animator.addListener(new Animator.AnimatorListener() {
+                        int i = 0;
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                            i++;
+                            tvAlltimeRemain.setText("总剩余时间："
+                                    +(int)(mTimerShow[0]*60f-i*(mTimerShow[0]+mTimerShow[1]))/60
+                                    +"min");
+
+
+                        }
+                    });
+                    animator.start();
+                    //sendTimer();
                     btnStart.setBackgroundResource(R.drawable.btn_start_en);
                     start_en = !start_en;
                 } else {
+                    animator.cancel();
                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                             "FE"
                                     + "01"
@@ -645,8 +758,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     start_en = !start_en;
                 }
                 break;
-
-
             case R.id.cirpro_arm:
                 hideGif();
                 gifArm.setVisibility(View.VISIBLE);
@@ -922,16 +1033,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "02"
-                        + String.format("%02x", mEveryRank[0])
-                        + String.format("%02x", mEveryRank[1])
-                        + String.format("%02x", mEveryRank[2])
-                        + String.format("%02x", mEveryRank[3])
-                        + String.format("%02x", mEveryRank[4])
-                        + String.format("%02x", mEveryRank[5])
-                        + String.format("%02x", mEveryRank[6])
-                        + String.format("%02x", mEveryRank[7])
-                        + String.format("%02x", mEveryRank[8])
-                        + String.format("%02x", mEveryRank[9])
+                        + String.format("%02x", mEveryRank[0]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[1]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[2]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[3]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[4]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[5]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[6]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[7]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[8]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[9]*mAllRank/100)
                         + "EF"
         );
     }
@@ -940,7 +1051,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "01"
-                        + "0" + (mAllRank == 0 ? 0 : 1)
+//                        + "0" + (mAllRank == 0 ? 0 : 1)
+                        + "00"
                         + String.format("%02x", mTimerShow[0])
                         + String.format("%02x", mTimerShow[1])
                         + String.format("%02x", mTimerShow[2])
@@ -1218,36 +1330,42 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
 
             case R.id.btn_time_all_minus:
+                if(!start_en) break;
                 if (mTimerShow[0] <= 5) break;
                 mTimerShow[0]--;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_all_add:
+                if(!start_en) break;
                 if (mTimerShow[0] >= 60) break;
                 mTimerShow[0]++;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_train_minus:
-                if (mTimerShow[1] <= 0) break;
+                if(!start_en) break;
+                if (mTimerShow[1] <= 8) break;
                 mTimerShow[1]--;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_train_add:
+                if(!start_en) break;
                 if (mTimerShow[1] >= 60) break;
                 mTimerShow[1]++;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_rest_minus:
-                if (mTimerShow[2] <= 0) break;
+                if(!start_en) break;
+                if (mTimerShow[2] <= 8) break;
                 mTimerShow[2]--;
                 btnRestShow.setText(mTimerShow[2] + "");
 
                 break;
             case R.id.btn_time_rest_add:
+                if(!start_en) break;
                 if (mTimerShow[2] >= 70) break;
                 mTimerShow[2]++;
                 btnRestShow.setText(mTimerShow[2] + "");
