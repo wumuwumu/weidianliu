@@ -13,6 +13,7 @@
         android:textColor="@color/white"
         android:text="总时间剩余：0min"
         android:id="@+id/tv_alltime_remain"
+        android:paddingLeft="20dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintTop_toTopOf="parent"
@@ -674,6 +675,7 @@
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/switch_aerobic"
+                app:theme="@style/Switch_control"
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
@@ -702,6 +704,7 @@
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/switch_anoxic"
                 android:layout_width="wrap_content"
+                app:theme="@style/Switch_control"
                 android:layout_height="wrap_content"/>
             <TextView
                 android:layout_width="match_parent"
@@ -727,6 +730,7 @@
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/switch_massage"
                 android:layout_width="wrap_content"
+                app:theme="@style/Switch_control"
                 android:layout_height="wrap_content"
                 />
             <TextView

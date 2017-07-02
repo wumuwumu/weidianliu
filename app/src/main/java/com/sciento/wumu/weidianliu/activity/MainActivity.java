@@ -235,6 +235,25 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     int mstop = 0;
     int mratio = 0;
     int alltime =0;
+
+    final ValueAnimator[] animator_hide = {
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         RequestPermissonUtil.mayRequestLocation(this);
@@ -348,6 +367,328 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         btnTimeRestAdd.setOnTouchListener(this);
 
 
+        //hide
+        animator_hide[0].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnArmMinus.setVisibility(View.INVISIBLE);
+                btnArmPlus.setVisibility(View.INVISIBLE);
+                gifArm.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+        animator_hide[1].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnShoulderMinus.setVisibility(View.INVISIBLE);
+                btnShoulderPlus.setVisibility(View.INVISIBLE);
+                gifShoudler.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[2].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnChestMinus.setVisibility(View.INVISIBLE);
+                btnChestPlus.setVisibility(View.INVISIBLE);
+                gifChest.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[3].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnAbdomenMinus.setVisibility(View.INVISIBLE);
+                btnAbdomenPlus.setVisibility(View.INVISIBLE);
+                gifAbdomen.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[4].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnBackMinus.setVisibility(View.INVISIBLE);
+                btnBackPlus.setVisibility(View.INVISIBLE);
+                gifBack.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+        animator_hide[5].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnWaistMinus.setVisibility(View.INVISIBLE);
+                btnWaistPlus.setVisibility(View.INVISIBLE);
+                gifWaist.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[6].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnForethighPlus.setVisibility(View.INVISIBLE);
+                btnForethighMinus.setVisibility(View.INVISIBLE);
+                gifHgighFore.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[7].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnBackthighMinus.setVisibility(View.INVISIBLE);
+                btnBackthighPlus.setVisibility(View.INVISIBLE);
+                gifHgighBack.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[8].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnHipsMinus.setVisibility(View.INVISIBLE);
+                btnHipsPlus.setVisibility(View.INVISIBLE);
+                gifHips.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[9].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnCalfsMinus.setVisibility(View.INVISIBLE);
+                btnCalfsPlus.setVisibility(View.INVISIBLE);
+                gifCalf.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[10].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                imgbtnAllMinus.setVisibility(View.INVISIBLE);
+                imgbtnAllAdd.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[11].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnTimeAllAdd.setVisibility(View.INVISIBLE);
+                btnTimeAllMinus.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[12].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnTimeTrainMinus.setVisibility(View.INVISIBLE);
+                btnTimeTrainAdd.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator_hide[13].addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnTimeRestMinus.setVisibility(View.INVISIBLE);
+                btnTimeRestAdd.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
 //        progressBar.setMax(70);
 //        Drawable indicator = getResources().getDrawable(
 //                //R.drawable.progress_indicator);
@@ -388,6 +729,54 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         //gif
         hideGif();
+
+        //hide
+        btnArmPlus.setVisibility(View.INVISIBLE);
+        btnArmMinus.setVisibility(View.INVISIBLE);
+
+        btnShoulderMinus.setVisibility(View.INVISIBLE);
+        btnShoulderPlus.setVisibility(View.INVISIBLE);
+
+        btnChestMinus.setVisibility(View.INVISIBLE);
+        btnChestPlus.setVisibility(View.INVISIBLE);
+
+        btnAbdomenMinus.setVisibility(View.INVISIBLE);
+        btnAbdomenPlus.setVisibility(View.INVISIBLE);
+
+        btnBackMinus.setVisibility(View.INVISIBLE);
+        btnBackPlus.setVisibility(View.INVISIBLE);
+
+        btnWaistMinus.setVisibility(View.INVISIBLE);
+        btnWaistPlus.setVisibility(View.INVISIBLE);
+
+        btnForethighMinus.setVisibility(View.INVISIBLE);
+        btnForethighPlus.setVisibility(View.INVISIBLE);
+
+        btnBackthighMinus.setVisibility(View.INVISIBLE);
+        btnBackthighPlus.setVisibility(View.INVISIBLE);
+
+        btnHipsMinus.setVisibility(View.INVISIBLE);
+        btnHipsPlus.setVisibility(View.INVISIBLE);
+
+        btnCalfsMinus.setVisibility(View.INVISIBLE);
+        btnCalfsPlus.setVisibility(View.INVISIBLE);
+
+        imgbtnAllMinus.setVisibility(View.INVISIBLE);
+        imgbtnAllAdd.setVisibility(View.INVISIBLE);
+
+        btnTimeAllMinus.setVisibility(View.INVISIBLE);
+        btnTimeAllAdd.setVisibility(View.INVISIBLE);
+
+        btnTimeRestMinus.setVisibility(View.INVISIBLE);
+        btnTimeRestAdd.setVisibility(View.INVISIBLE);
+
+        btnTimeTrainMinus.setVisibility(View.INVISIBLE);
+        btnTimeTrainAdd.setVisibility(View.INVISIBLE);
+
+        for(int i =0 ; i<animator_hide.length;i++){
+            animator_hide[i].setDuration(5000);
+            animator_hide[i].setRepeatCount(1);
+        }
 
     }
 
@@ -588,7 +977,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             R.id.cirpro_backthigh,
             R.id.cirpro_hips,
             R.id.cirpro_calfs,
-
+            R.id.imgbtn_all_show,
+            R.id.btn_controler_show,
+            R.id.btn_rest_show,
+            R.id.btn_train_show,
 //            R.id.gif_arm,
 //            R.id.gif_shoudler,
 //            R.id.gif_chest,
@@ -615,8 +1007,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 //            R.id.btn_time_train_minus, R.id.btn_time_train_add,
 //            R.id.btn_time_rest_minus, R.id.btn_time_rest_add
     })
-    public void
-    OnClick(View v) {
+    public void OnClick(View v) {
         switch (v.getId()) {
             case R.id.btn_blu:
                 if (!isConnected) {
@@ -630,7 +1021,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.btn_start:
                 if (!start_en) {
                     //sendCurrentSignal();
-                    mratio = (int)(200*3f/(mTimerShow[1]+mTimerShow[2]));
+                    mratio = (int)(200*2f/(mTimerShow[1]+mTimerShow[2]));
                      mstart= (int)(200.0f*mTimerShow[1]/(mTimerShow[1]+mTimerShow[2]));
                      mstop = 200-mstart;
                     //animator.end();
@@ -659,7 +1050,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             if(integer<mstart) {
                                 progressBar.setProgress((int)(integer*70.0f/mstart));
                                 tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1]-(int)(integer/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
-                                if(integer%mratio == 0 || integer== mstart-2){
+                                if(integer%mratio == 0 ){
                                 startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                                         "FE"
                                                 + "01"
@@ -681,7 +1072,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             }else {
                                 progressBar.setProgress((int)((200-integer)*70.0f/mstop));
                                 tvResttimeRemain.setText("休息剩余时间" + ((int)((200-integer)/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
-                                if(integer%mratio == 0 || integer==198) {
+                                if(integer%mratio == 0 || integer==mstart ) {
                                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                                             "FE"
                                                     + "01"
@@ -710,6 +1101,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         @Override
                         public void onAnimationStart(Animator animation) {
 
+
                         }
 
                         @Override
@@ -726,9 +1118,23 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         public void onAnimationRepeat(Animator animation) {
                             i++;
                             tvAlltimeRemain.setText("总剩余时间："
-                                    +(int)(mTimerShow[0]*60f-i*(mTimerShow[0]+mTimerShow[1]))/60
+                                    +((int)(mTimerShow[0]*60f-i*(mTimerShow[0]+mTimerShow[1]))/60+1)
                                     +"min");
-
+                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                    "FE"
+                                            + "01"
+                                            + "01"
+                                            + String.format("%02x", mTimerShow[0])
+                                            + String.format("%02x", mTimerShow[1])
+                                            + String.format("%02x", mTimerShow[2])
+                                            + "0" + modeSelect
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "EF"
+                            );
 
                         }
                     });
@@ -753,51 +1159,144 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                     + "00"
                                     + "EF"
                     );
-                    sendTimer();
+                    //sendTimer();
                     btnStart.setBackgroundResource(R.drawable.btn_start_dis);
                     start_en = !start_en;
                 }
                 break;
             case R.id.cirpro_arm:
                 hideGif();
-                gifArm.setVisibility(View.VISIBLE);
+                if(btnArmMinus.getVisibility() != View.VISIBLE){
+                    //animator_hide[0].cancel();
+                    btnArmMinus.setVisibility(View.VISIBLE);
+                    btnArmPlus.setVisibility(View.VISIBLE);
+                    gifArm.setVisibility(View.VISIBLE);
+                    animator_hide[0].start();
+                }
+
                 break;
 
             case R.id.cirpro_shoudler:
                 hideGif();
-                gifShoudler.setVisibility(View.VISIBLE);
+                if(btnShoulderMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnShoulderMinus.setVisibility(View.VISIBLE);
+                    btnShoulderPlus.setVisibility(View.VISIBLE);
+                    gifShoudler.setVisibility(View.VISIBLE);
+                    animator_hide[1].start();
+                }
                 break;
             case R.id.cirpro_chest:
                 hideGif();
-                gifChest.setVisibility(View.VISIBLE);
+                if(btnChestMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnChestMinus.setVisibility(View.VISIBLE);
+                    btnChestPlus.setVisibility(View.VISIBLE);
+                    gifChest.setVisibility(View.VISIBLE);
+                    animator_hide[2].start();
+                }
                 break;
             case R.id.cirpro_abdomen:
                 hideGif();
-                gifAbdomen.setVisibility(View.VISIBLE);
+                if(btnAbdomenMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnAbdomenMinus.setVisibility(View.VISIBLE);
+                    btnAbdomenPlus.setVisibility(View.VISIBLE);
+                    gifAbdomen.setVisibility(View.VISIBLE);
+                    animator_hide[3].start();
+                }
                 break;
             case R.id.cirpro_back:
                 hideGif();
-                gifBack.setVisibility(View.VISIBLE);
+                if(btnBackMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnBackMinus.setVisibility(View.VISIBLE);
+                    btnBackPlus.setVisibility(View.VISIBLE);
+                    gifBack.setVisibility(View.VISIBLE);
+                    animator_hide[4].start();
+                }
                 break;
             case R.id.cirpro_waist:
                 hideGif();
-                gifWaist.setVisibility(View.VISIBLE);
+                if(btnWaistMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnWaistMinus.setVisibility(View.VISIBLE);
+                    btnWaistPlus.setVisibility(View.VISIBLE);
+                    gifWaist.setVisibility(View.VISIBLE);
+                    animator_hide[5].start();
+                }
                 break;
             case R.id.cirpro_forethigh:
                 hideGif();
-                gifHgighFore.setVisibility(View.VISIBLE);
+                if(btnForethighMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnForethighMinus.setVisibility(View.VISIBLE);
+                    btnForethighPlus.setVisibility(View.VISIBLE);
+                    gifHgighFore.setVisibility(View.VISIBLE);
+                    animator_hide[6].start();
+                }
                 break;
             case R.id.cirpro_backthigh:
                 hideGif();
-                gifHgighBack.setVisibility(View.VISIBLE);
+                if(btnBackthighMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnBackthighMinus.setVisibility(View.VISIBLE);
+                    btnBackthighPlus.setVisibility(View.VISIBLE);
+                    gifHgighBack.setVisibility(View.VISIBLE);
+                    animator_hide[7].start();
+                }
                 break;
             case R.id.cirpro_hips:
                 hideGif();
-                gifHips.setVisibility(View.VISIBLE);
+                if(btnHipsMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnHipsPlus.setVisibility(View.VISIBLE);
+                    btnHipsMinus.setVisibility(View.VISIBLE);
+                    gifHips.setVisibility(View.VISIBLE);
+                    animator_hide[8].start();
+                }
                 break;
             case R.id.cirpro_calfs:
                 hideGif();
-                gifCalf.setVisibility(View.VISIBLE);
+                if(btnCalfsMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnCalfsMinus.setVisibility(View.VISIBLE);
+                    btnCalfsPlus.setVisibility(View.VISIBLE);
+                    gifCalf.setVisibility(View.VISIBLE);
+                    animator_hide[9].start();
+                }
+                break;
+            case R.id.imgbtn_all_show:
+                if(imgbtnAllMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    imgbtnAllMinus.setVisibility(View.VISIBLE);
+                    imgbtnAllAdd.setVisibility(View.VISIBLE);
+                    animator_hide[10].start();
+                }
+                break;
+            case R.id.btn_controler_show:
+                if(btnTimeAllMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnTimeAllMinus.setVisibility(View.VISIBLE);
+                    btnTimeAllAdd.setVisibility(View.VISIBLE);
+                    animator_hide[11].start();
+                }
+                break;
+            case R.id.btn_train_show:
+                if(btnTimeTrainMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnTimeTrainMinus.setVisibility(View.VISIBLE);
+                    btnTimeTrainAdd.setVisibility(View.VISIBLE);
+                    animator_hide[12].start();
+                }
+                break;
+            case R.id.btn_rest_show:
+                if(btnTimeRestMinus.getVisibility() != View.VISIBLE) {
+                    //animator_hide[0].cancel();
+                    btnTimeRestMinus.setVisibility(View.VISIBLE);
+                    btnTimeRestAdd.setVisibility(View.VISIBLE);
+                    animator_hide[13].start();
+                }
                 break;
 //            case R.id.btn_arm_minus:
 //                if (mEveryRank[0] <= 0) break;
@@ -1081,10 +1580,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 updateControlData(v);
                 break;
             case MotionEvent.ACTION_UP:
-                if(start_en)
-                {
+
                     sendInfor(v);
-                }
+
 
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -1097,95 +1595,157 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     void sendInfor(View v) {
         switch (v.getId()) {
             case R.id.btn_arm_minus:
+                //animator_hide[0].cancel();
+                animator_hide[0].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_arm_plus:
+                //animator_hide[0].cancel();
+                animator_hide[0].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_shoulder_minus:
+                //animator_hide[1].cancel();
+                animator_hide[1].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_shoulder_plus:
+                //animator_hide[1].cancel();
+                animator_hide[1].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_chest_minus:
+                //animator_hide[2].cancel();
+                animator_hide[2].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_chest_plus:
+                //animator_hide[2].cancel();
+                animator_hide[2].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_abdomen_minus:
+                //animator_hide[3].cancel();
+                animator_hide[3].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_abdomen_plus:
+               // animator_hide[3].cancel();
+                animator_hide[3].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_back_minus:
+                //animator_hide[4].cancel();
+                animator_hide[4].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_back_plus:
+                //animator_hide[4].cancel();
+                animator_hide[4].start();
                 sendCurrentSignal();
                 break;
 
 
             case R.id.btn_waist_minus:
+               // animator_hide[5].cancel();
+                animator_hide[5].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_waist_plus:
+                //animator_hide[5].cancel();
+                animator_hide[5].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_forethigh_minus:
+               // animator_hide[6].cancel();
+                animator_hide[6].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_forethigh_plus:
+               // animator_hide[6].cancel();
+                animator_hide[6].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_backthigh_minus:
+               // animator_hide[7].cancel();
+                animator_hide[7].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_backthigh_plus:
+                //animator_hide[7].cancel();
+                animator_hide[7].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_hips_minus:
+               // animator_hide[8].cancel();
+                animator_hide[8].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_hips_plus:
+               // animator_hide[8].cancel();
+                animator_hide[8].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_calfs_minus:
+                //animator_hide[9].cancel();
+                animator_hide[9].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_calfs_plus:
+                //animator_hide[9].cancel();
+                animator_hide[9].start();
                 sendCurrentSignal();
                 break;
 
 
             case R.id.imgbtn_all_minus:
+                //animator_hide[10].cancel();
+                animator_hide[10].start();
                 sendCurrentSignal();
                 sendTimer();
                 break;
             case R.id.imgbtn_all_add:
+                //animator_hide[10].cancel();
+                animator_hide[10].start();
                 sendCurrentSignal();
                 sendTimer();
                 break;
 
             case R.id.btn_time_all_minus:
+                if(!start_en)  break;
+               // animator_hide[11].cancel();
+                animator_hide[11].start();
                 sendTimer();
 
                 break;
             case R.id.btn_time_all_add:
+                if(!start_en)  break;
+               // animator_hide[11].cancel();
+                animator_hide[11].start();
                 sendTimer();
                 break;
             case R.id.btn_time_train_minus:
+                if(!start_en)  break;
+               // animator_hide[12].cancel();
+                animator_hide[12].start();
                 sendTimer();
                 break;
             case R.id.btn_time_train_add:
+                if(!start_en)  break;
+               // animator_hide[12].cancel();
+                animator_hide[12].start();
                 sendTimer();
                 break;
             case R.id.btn_time_rest_minus:
+                if(!start_en)  break;
+               // animator_hide[13].cancel();
+                animator_hide[13].start();
                 sendTimer();
                 break;
             case R.id.btn_time_rest_add:
+                if(!start_en)  break;
+                //animator_hide[13].cancel();
+                animator_hide[13].start();
                 sendTimer();
                 break;
         }
@@ -1330,42 +1890,42 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
 
             case R.id.btn_time_all_minus:
-                if(!start_en) break;
+                if(start_en) break;
                 if (mTimerShow[0] <= 5) break;
                 mTimerShow[0]--;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_all_add:
-                if(!start_en) break;
+                if(start_en) break;
                 if (mTimerShow[0] >= 60) break;
                 mTimerShow[0]++;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_train_minus:
-                if(!start_en) break;
-                if (mTimerShow[1] <= 8) break;
+                if(start_en) break;
+                if (mTimerShow[1] <= 5) break;
                 mTimerShow[1]--;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_train_add:
-                if(!start_en) break;
+                if(start_en) break;
                 if (mTimerShow[1] >= 60) break;
                 mTimerShow[1]++;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_rest_minus:
-                if(!start_en) break;
-                if (mTimerShow[2] <= 8) break;
+                if(start_en) break;
+                if (mTimerShow[2] <= 5) break;
                 mTimerShow[2]--;
                 btnRestShow.setText(mTimerShow[2] + "");
 
                 break;
             case R.id.btn_time_rest_add:
-                if(!start_en) break;
+                if(start_en) break;
                 if (mTimerShow[2] >= 70) break;
                 mTimerShow[2]++;
                 btnRestShow.setText(mTimerShow[2] + "");
@@ -1373,5 +1933,51 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
                 break;
         }
+    }
+
+
+    void hideAllBtn()
+    {
+        btnArmPlus.setVisibility(View.INVISIBLE);
+        btnArmMinus.setVisibility(View.INVISIBLE);
+
+        btnShoulderMinus.setVisibility(View.INVISIBLE);
+        btnShoulderPlus.setVisibility(View.INVISIBLE);
+
+        btnChestMinus.setVisibility(View.INVISIBLE);
+        btnChestPlus.setVisibility(View.INVISIBLE);
+
+        btnAbdomenMinus.setVisibility(View.INVISIBLE);
+        btnAbdomenPlus.setVisibility(View.INVISIBLE);
+
+        btnBackMinus.setVisibility(View.INVISIBLE);
+        btnBackPlus.setVisibility(View.INVISIBLE);
+
+        btnWaistMinus.setVisibility(View.INVISIBLE);
+        btnWaistPlus.setVisibility(View.INVISIBLE);
+
+        btnForethighMinus.setVisibility(View.INVISIBLE);
+        btnForethighPlus.setVisibility(View.INVISIBLE);
+
+        btnBackthighMinus.setVisibility(View.INVISIBLE);
+        btnBackthighPlus.setVisibility(View.INVISIBLE);
+
+        btnHipsMinus.setVisibility(View.INVISIBLE);
+        btnHipsPlus.setVisibility(View.INVISIBLE);
+
+        btnCalfsMinus.setVisibility(View.INVISIBLE);
+        btnCalfsPlus.setVisibility(View.INVISIBLE);
+
+        imgbtnAllMinus.setVisibility(View.INVISIBLE);
+        imgbtnAllAdd.setVisibility(View.INVISIBLE);
+
+        btnTimeAllMinus.setVisibility(View.INVISIBLE);
+        btnTimeAllAdd.setVisibility(View.INVISIBLE);
+
+        btnTimeRestMinus.setVisibility(View.INVISIBLE);
+        btnTimeRestAdd.setVisibility(View.INVISIBLE);
+
+        btnTimeTrainMinus.setVisibility(View.INVISIBLE);
+        btnTimeTrainAdd.setVisibility(View.INVISIBLE);
     }
 }

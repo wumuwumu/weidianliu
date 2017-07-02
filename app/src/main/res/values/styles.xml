@@ -58,7 +58,7 @@
         <item name="android:layout_width">50dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/left_subtract</item>
-        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_marginRight">20dp</item>
 
     </style>
 
@@ -67,7 +67,7 @@
         <item name="android:layout_width">50dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/left_add</item>
-        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
 
     </style>
 
@@ -80,9 +80,10 @@
         <item name="android:background">@drawable/right_base</item>
     </style>
 
-    <style name="Switch_control" parent="Theme.AppCompat.Light">
+    <style name="Switch_control" parent="Theme.AppCompat.Light" >
         <!-- active thumb & track color (30% transparency) -->
         <item name="colorControlActivated">@color/circleprocolor</item>
+        <item name="colorSwitchThumbNormal">#cccccc</item>
     </style>
 
 
