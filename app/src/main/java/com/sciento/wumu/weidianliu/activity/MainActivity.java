@@ -48,6 +48,34 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         View.OnTouchListener {
 
 
+    private static final String TAG = "MainActivity";
+    //uuid
+    private static final UUID ZZR_UUID_BLE_SERVICE = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb");
+    private static final UUID ZZR_UUID_BLE_CHAR = UUID.fromString("0000FFF2-0000-1000-8000-00805f9b34fb");
+    private static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF3-0000-1000-8000-00805f9b34fb");
+    //蓝牙连接
+    public static BleManager bleManager;
+    //animator
+    final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
+    final ValueAnimator[] animator_hide = {
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+            ValueAnimator.ofInt(0, 20),
+
+    };
+    private final String lockName = "BlackBat";
+    private final int MSG_GET_DATE = 0;
     @BindView(R.id.tv_alltime_remain)
     TextView tvAlltimeRemain;
     @BindView(R.id.tv_resttime_remain)
@@ -198,23 +226,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     Button btnBlu;
     @BindView(R.id.btn_start)
     Button btnStart;
-
-
-
-    //蓝牙连接
-    public static BleManager bleManager;
-    private BluetoothAdapter mBluetoothAdapter;
-    private static final String TAG = "MainActivity";
-    private final String lockName = "BlackBat";
-    private boolean isConnected = false;
-
-    private final int MSG_GET_DATE = 0;
-
-    //uuid
-    private static final UUID ZZR_UUID_BLE_SERVICE = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb");
-    private static final UUID ZZR_UUID_BLE_CHAR = UUID.fromString("0000FFF2-0000-1000-8000-00805f9b34fb");
-    private static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF3-0000-1000-8000-00805f9b34fb");
-
     //显示值
     int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int mAllRank = 0;
@@ -228,30 +239,171 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     boolean start_en = false;
 
     int mallRankCopy = 0;
-
-    //animator
-    final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
     int mstart =0;
     int mstop = 0;
     int mratio = 0;
     int alltime =0;
+    //get back
+    long mIntervelTime = 0;
+    private BluetoothAdapter mBluetoothAdapter;
+    private boolean isConnected = false;
+    private Handler HandlerBlu = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_GET_DATE:
+                    Bundle myBundle = msg.getData();
+                    byte[] mbyte = myBundle.getByteArray("datearray");
 
-    final ValueAnimator[] animator_hide = {
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
-            ValueAnimator.ofInt(0, 20),
+                    if (System.currentTimeMillis() - mIntervelTime < 1500) {
+                        if (!start_en) {
 
+                            //sendCurrentSignal();
+                            mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
+                            mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
+                            mstop = 200 - mstart;
+                            //animator.end();
+                            animator.cancel();
+                            alltime = mTimerShow[0] * 60;
+                            tvAlltimeRemain.setText("总剩余时间：" + mTimerShow[0] + "min");
+                            animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
+                            animator.setRepeatCount((int) (mTimerShow[0] * 60.0f / (mTimerShow[1] + mTimerShow[2])));
+                            animator.setInterpolator(new LinearInterpolator());
+                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                    int integer = (int) animator.getAnimatedValue();
+                                    if (integer < mstart) {
+                                        progressBar.setProgress((int) (integer * 70.0f / mstart));
+                                        tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                                        if (integer % mratio == 0) {
+                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                                    "FE"
+                                                            + "01"
+                                                            + "01"
+                                                            + String.format("%02x", mTimerShow[0])
+                                                            + String.format("%02x", mTimerShow[1])
+                                                            + String.format("%02x", mTimerShow[2])
+                                                            + "0" + modeSelect
+                                                            + "00"
+                                                            + "00"
+                                                            + "00"
+                                                            + "00"
+                                                            + "00"
+                                                            + "EF"
+                                            );
+                                        }
+
+                                    } else {
+                                        progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
+                                        tvResttimeRemain.setText("休息剩余时间" + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                                        if (integer % mratio == 0 || integer == mstart) {
+                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                                    "FE"
+                                                            + "01"
+                                                            + "00"
+                                                            + String.format("%02x", mTimerShow[0])
+                                                            + String.format("%02x", mTimerShow[1])
+                                                            + String.format("%02x", mTimerShow[2])
+                                                            + "0" + modeSelect
+                                                            + "00"
+                                                            + "00"
+                                                            + "00"
+                                                            + "00"
+                                                            + "00"
+                                                            + "EF"
+                                            );
+                                        }
+                                    }
+
+
+                                    // progressBar.setProgress(integer);
+                                }
+                            });
+
+                            animator.addListener(new Animator.AnimatorListener() {
+                                int i = 0;
+
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                                }
+
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+                                    i++;
+                                    tvAlltimeRemain.setText("总剩余时间："
+                                            + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[0] + mTimerShow[1])) / 60 + 1)
+                                            + "min");
+                                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                            "FE"
+                                                    + "01"
+                                                    + "01"
+                                                    + String.format("%02x", mTimerShow[0])
+                                                    + String.format("%02x", mTimerShow[1])
+                                                    + String.format("%02x", mTimerShow[2])
+                                                    + "0" + modeSelect
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "EF"
+                                    );
+
+                                }
+                            });
+                            animator.start();
+                            mIntervelTime = 0;
+
+                            //sendTimer();
+                            btnStart.setBackgroundResource(R.drawable.btn_start_en);
+                            start_en = !start_en;
+                        } else {
+                            animator.cancel();
+                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                    "FE"
+                                            + "01"
+                                            + "00"
+                                            + String.format("%02x", mTimerShow[0])
+                                            + String.format("%02x", mTimerShow[1])
+                                            + String.format("%02x", mTimerShow[2])
+                                            + "0" + modeSelect
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "EF"
+                            );
+                            //sendTimer();
+                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                            start_en = !start_en;
+                        }
+                    }
+//                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
+//
+//                    if (mbyte[4] > 0) {
+//                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
+//                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
+//                    } else {
+//                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
+//                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
+//                    }
+                    //Toast.makeText(MainActivity.this,""+mbyte[2],Toast.LENGTH_SHORT).show();
+            }
+        }
     };
 
     @Override
@@ -264,7 +416,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         init();
         initEvent();
     }
-
 
     //是否支持蓝牙
     private void checkBLEFeature() {
@@ -793,7 +944,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         bleManager.enableBluetooth();
     }
 
-
     private void connectNameDevice(final String deviceName) {
 
         bleManager.scanNameAndConnect(deviceName, 20000, false, new BleGattCallback() {
@@ -943,28 +1093,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
     }
 
-    private Handler HandlerBlu = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_GET_DATE:
-                    Bundle myBundle = msg.getData();
-                    byte[] mbyte = myBundle.getByteArray("datearray");
-//                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
-//
-//                    if (mbyte[4] > 0) {
-//                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
-//                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
-//                    } else {
-//                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
-//                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
-//                    }
-                    //Toast.makeText(MainActivity.this,""+mbyte[2],Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-
     @OnClick({R.id.btn_blu,
             R.id.btn_start,
             R.id.cirpro_arm,
@@ -1020,130 +1148,27 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
             case R.id.btn_start:
                 if (!start_en) {
-                    //sendCurrentSignal();
-                    mratio = (int)(200*2f/(mTimerShow[1]+mTimerShow[2]));
-                     mstart= (int)(200.0f*mTimerShow[1]/(mTimerShow[1]+mTimerShow[2]));
-                     mstop = 200-mstart;
-                    //animator.end();
-                    animator.cancel();
-                    alltime = mTimerShow[0]*60;
-                    tvAlltimeRemain.setText("总剩余时间：" + mTimerShow[0]+"min");
-                    animator.setDuration((mTimerShow[1]+mTimerShow[2])*1000);
-//                    animator.setDuration(6000);
-                    animator.setRepeatCount((int)(mTimerShow[0]*60.0f/(mTimerShow[1]+mTimerShow[2])));
-                    animator.setInterpolator(new LinearInterpolator());
-                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            int integer = (int) animator.getAnimatedValue();
-                            //cirproArm.setProgress(integer/2);
-//                            if(integer == 160)
-//                            {
-////                                alltime =alltime - (mTimerShow[1]+mTimerShow[2]);
-//                                alltime =alltime - 1;
-//                                Toast.makeText(MainActivity.this,""+alltime,Toast.LENGTH_SHORT).show();
-//                                tvAlltimeRemain.setText("总剩余时间：" + alltime/60+ "///"+alltime+"///"+animator.+"min");
-//                            }
-//                            tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1]-(int)(integer/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
-//                            Toast.makeText(MainActivity.this,""+integer,Toast.LENGTH_SHORT).show();
-
-                            if(integer<mstart) {
-                                progressBar.setProgress((int)(integer*70.0f/mstart));
-                                tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1]-(int)(integer/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
-                                if(integer%mratio == 0 ){
-                                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                        "FE"
-                                                + "01"
-                                                + "01"
-                                                + String.format("%02x", mTimerShow[0])
-                                                + String.format("%02x", mTimerShow[1])
-                                                + String.format("%02x", mTimerShow[2])
-                                                + "0" + modeSelect
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "EF"
-                                );
-                                }
-
-//                                progressBar.setProgress(integer);
-                            }else {
-                                progressBar.setProgress((int)((200-integer)*70.0f/mstop));
-                                tvResttimeRemain.setText("休息剩余时间" + ((int)((200-integer)/200f*(mTimerShow[1]+mTimerShow[2])))+"s");
-                                if(integer%mratio == 0 || integer==mstart ) {
-                                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                            "FE"
-                                                    + "01"
-                                                    + "00"
-                                                    + String.format("%02x", mTimerShow[0])
-                                                    + String.format("%02x", mTimerShow[1])
-                                                    + String.format("%02x", mTimerShow[2])
-                                                    + "0" + modeSelect
-                                                    + "00"
-                                                    + "00"
-                                                    + "00"
-                                                    + "00"
-                                                    + "00"
-                                                    + "EF"
-                                    );
-                                }
-                            }
+                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                            "FE"
+                                    + "01"
+                                    + "01"
+                                    + String.format("%02x", mTimerShow[0])
+                                    + String.format("%02x", mTimerShow[1])
+                                    + String.format("%02x", mTimerShow[2])
+                                    + "0" + modeSelect
+                                    + "01"
+                                    + "00"
+                                    + "00"
+                                    + "00"
+                                    + "00"
+                                    + "EF"
+                    );
 
 
-                           // progressBar.setProgress(integer);
-                        }
-                    });
-
-                    animator.addListener(new Animator.AnimatorListener() {
-                        int i = 0;
-                        @Override
-                        public void onAnimationStart(Animator animation) {
 
 
-                        }
 
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-                            i++;
-                            tvAlltimeRemain.setText("总剩余时间："
-                                    +((int)(mTimerShow[0]*60f-i*(mTimerShow[0]+mTimerShow[1]))/60+1)
-                                    +"min");
-                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                    "FE"
-                                            + "01"
-                                            + "01"
-                                            + String.format("%02x", mTimerShow[0])
-                                            + String.format("%02x", mTimerShow[1])
-                                            + String.format("%02x", mTimerShow[2])
-                                            + "0" + modeSelect
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "EF"
-                            );
-
-                        }
-                    });
-                    animator.start();
-                    //sendTimer();
-                    btnStart.setBackgroundResource(R.drawable.btn_start_en);
-                    start_en = !start_en;
                 } else {
-                    animator.cancel();
                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                             "FE"
                                     + "01"
@@ -1152,17 +1177,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                     + String.format("%02x", mTimerShow[1])
                                     + String.format("%02x", mTimerShow[2])
                                     + "0" + modeSelect
-                                    + "00"
+                                    + "02"
                                     + "00"
                                     + "00"
                                     + "00"
                                     + "00"
                                     + "EF"
                     );
-                    //sendTimer();
-                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                    start_en = !start_en;
+
+
                 }
+                mIntervelTime = System.currentTimeMillis();
                 break;
             case R.id.cirpro_arm:
                 hideGif();
