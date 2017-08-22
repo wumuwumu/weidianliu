@@ -2,6 +2,7 @@ package com.sciento.wumu.weidianliu.activity;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -9,20 +10,32 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,12 +44,22 @@ import com.clj.fastble.BleManager;
 import com.clj.fastble.conn.BleCharacterCallback;
 import com.clj.fastble.conn.BleGattCallback;
 import com.clj.fastble.exception.BleException;
+import com.clj.fastble.scan.ListScanCallback;
 import com.clj.fastble.utils.HexUtil;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.sciento.wumu.weidianliu.R;
+import com.sciento.wumu.weidianliu.adapter.DeviceListAdapter;
+import com.sciento.wumu.weidianliu.utils.ProgressDialogUtils;
 import com.sciento.wumu.weidianliu.utils.RequestPermissonUtil;
 import com.sciento.wumu.weidianliu.view.LongClickButton;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Queue;
 import java.util.UUID;
 
 import butterknife.BindView;
@@ -51,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static final String TAG = "MainActivity";
     //uuid
     private static final UUID ZZR_UUID_BLE_SERVICE = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb");
-    private static final UUID ZZR_UUID_BLE_CHAR = UUID.fromString("0000FFF2-0000-1000-8000-00805f9b34fb");
-    private static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF3-0000-1000-8000-00805f9b34fb");
+    private static final UUID ZZR_UUID_BLE_CHAR = UUID.fromString("0000FFF1-0000-1000-8000-00805f9b34fb");
+    private static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF4-0000-1000-8000-00805f9b34fb");
     //蓝牙连接
     public static BleManager bleManager;
     //animator
@@ -74,8 +97,21 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             ValueAnimator.ofInt(0, 20),
 
     };
-    private final String lockName = "BlackBat";
+    final ValueAnimator task = ValueAnimator.ofInt(0, 200);
     private final int MSG_GET_DATE = 0;
+    private final int MSG_QUEUE_DATE = 2;
+    private final int MSG_SHOW_DATE = 1;
+    private final int MSG_UPDATE_DEVICE_NAME = 3;
+    @BindView(R.id.btn_open_drawer)
+    Button btnOpenDrawer;
+    @BindView(R.id.ll_drawer)
+    LinearLayout llDrawer;
+    @BindView(R.id.dl_all)
+    DrawerLayout dlAll;
+    @BindView(R.id.btn_chinese)
+    Button btnChinese;
+    @BindView(R.id.btn_english)
+    Button btnEnglish;
     @BindView(R.id.tv_alltime_remain)
     TextView tvAlltimeRemain;
     @BindView(R.id.tv_resttime_remain)
@@ -226,12 +262,18 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     Button btnBlu;
     @BindView(R.id.btn_start)
     Button btnStart;
+    @BindView(R.id.img_battery)
+    ImageView imgBattery;
     //显示值
     int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int mAllRank = 0;
     //timer
-    int[] mTimerShow = {5, 5, 5};
+    int[] mTimerShow = {1, 0, 0};
 
+    List<BluetoothDevice> deviceList = new ArrayList<>();
+    BluetoothDevice connectDevice;
+
+    Queue<Byte> BleQueue = new LinkedList<Byte>();
     //mode
     int modeSelect = 1;
 
@@ -239,113 +281,289 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     boolean start_en = false;
 
     int mallRankCopy = 0;
-    int mstart =0;
+    int mstart = 0;
     int mstop = 0;
     int mratio = 0;
-    int alltime =0;
+    int alltime = 0;
     //get back
     long mIntervelTime = 0;
+    @BindView(R.id.btn_find_bledevice)
+    Button btnFindBledevice;
+    @BindView(R.id.linearLayout)
+    LinearLayout linearLayout;
+    @BindView(R.id.lv_bledevice_list)
+    ListView lvBledeviceList;
+    byte[] mbytecopy = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    @BindView(R.id.btn_about)
+    Button btnAbout;
+    //    private String lockName = "BlakBat";
+    private String lockName = "";
     private BluetoothAdapter mBluetoothAdapter;
     private boolean isConnected = false;
-    private Handler HandlerBlu = new Handler() {
+    private Handler HandlerBlu;
+    private Handler HandlerBluMain = new Handler() {
+
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_GET_DATE:
-                    Bundle myBundle = msg.getData();
-                    byte[] mbyte = myBundle.getByteArray("datearray");
+                case MSG_SHOW_DATE:
+                    Bundle queueyBundle = msg.getData();
+                    byte[] queuebyte = queueyBundle.getByteArray("datearray");
+                    analyseData(queuebyte);
+                    break;
+                case MSG_UPDATE_DEVICE_NAME:
+                    //获取一个文件名为test、权限为private的xml文件的SharedPreferences对象
+                    SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", MODE_PRIVATE);
 
-                    if (System.currentTimeMillis() - mIntervelTime < 1500) {
-                        if (!start_en) {
+                    //得到SharedPreferences.Editor对象，并保存数据到该对象中
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("devicename", lockName);
 
-                            //sendCurrentSignal();
-                            mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
-                            mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
-                            mstop = 200 - mstart;
-                            //animator.end();
-                            animator.cancel();
-                            alltime = mTimerShow[0] * 60;
-                            tvAlltimeRemain.setText("总剩余时间：" + mTimerShow[0] + "min");
-                            animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
-                            animator.setRepeatCount((int) (mTimerShow[0] * 60.0f / (mTimerShow[1] + mTimerShow[2])));
-                            animator.setInterpolator(new LinearInterpolator());
-                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                    int integer = (int) animator.getAnimatedValue();
-                                    if (integer < mstart) {
-                                        progressBar.setProgress((int) (integer * 70.0f / mstart));
-                                        tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-                                        if (integer % mratio == 0) {
-                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                                    "FE"
-                                                            + "01"
-                                                            + "01"
-                                                            + String.format("%02x", mTimerShow[0])
-                                                            + String.format("%02x", mTimerShow[1])
-                                                            + String.format("%02x", mTimerShow[2])
-                                                            + "0" + modeSelect
-                                                            + "00"
-                                                            + "00"
-                                                            + "00"
-                                                            + "00"
-                                                            + "00"
-                                                            + "EF"
-                                            );
-                                        }
+                    //保存key-value对到文件中
+                    editor.commit();
+                    break;
+            }
 
-                                    } else {
-                                        progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
-                                        tvResttimeRemain.setText("休息剩余时间" + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-                                        if (integer % mratio == 0 || integer == mstart) {
-                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                                    "FE"
-                                                            + "01"
-                                                            + "00"
-                                                            + String.format("%02x", mTimerShow[0])
-                                                            + String.format("%02x", mTimerShow[1])
-                                                            + String.format("%02x", mTimerShow[2])
-                                                            + "0" + modeSelect
-                                                            + "00"
-                                                            + "00"
-                                                            + "00"
-                                                            + "00"
-                                                            + "00"
-                                                            + "EF"
-                                            );
-                                        }
+            //super.handleMessage(msg);
+        }
+    };
+    Thread thread = new Thread() {
+
+        @Override
+        public void run() {
+            Looper.prepare();
+            HandlerBlu = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    switch (msg.what) {
+                        case MSG_GET_DATE:
+//                    Bundle myBundle = msg.getData();
+//
+//                    byte[] mbyte = myBundle.getByteArray("datearray");
+//                    Toast.makeText(MainActivity.this, Arrays.toString(mbyte),Toast.LENGTH_SHORT).show();
+//                    mbytecopy = mbyte;
+//                    if (System.currentTimeMillis() - mIntervelTime < 5000) {
+//                        if (!start_en && mbyte[6] == 1) {
+//
+//                            //sendCurrentSignal();
+//                            mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
+//                            mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
+//                            mstop = 200 - mstart;
+//                            //animator.end();
+//                            animator.cancel();
+//                            alltime = mTimerShow[0] * 60;
+//                            tvAlltimeRemain.setText("总剩余时间：" + mTimerShow[0] + "min");
+//                            animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
+//                            animator.setRepeatCount((int) (mTimerShow[0] * 60.0f / (mTimerShow[1] + mTimerShow[2])));
+//                            animator.setInterpolator(new LinearInterpolator());
+//                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                                @Override
+//                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                                    int integer = (int) animator.getAnimatedValue();
+//                                    if (integer < mstart) {
+//                                        progressBar.setProgress((int) (integer * 70.0f / mstart));
+//                                        tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+//                                        if (integer % mratio == 0) {
+//                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                                                    "FE"
+//                                                            + "01"
+//                                                            + "01"
+//                                                            + String.format("%02x", mTimerShow[0])
+//                                                            + String.format("%02x", mTimerShow[1])
+//                                                            + String.format("%02x", mTimerShow[2])
+//                                                            + "0" + modeSelect
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "EF"
+//                                            );
+//                                        }
+//
+//                                    } else {
+//                                        progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
+//                                        tvResttimeRemain.setText("休息剩余时间" + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+//                                        if (integer % mratio == 0 || integer == mstart) {
+//                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                                                    "FE"
+//                                                            + "01"
+//                                                            + "00"
+//                                                            + String.format("%02x", mTimerShow[0])
+//                                                            + String.format("%02x", mTimerShow[1])
+//                                                            + String.format("%02x", mTimerShow[2])
+//                                                            + "0" + modeSelect
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "00"
+//                                                            + "EF"
+//                                            );
+//                                        }
+//                                    }
+//
+//
+//                                    // progressBar.setProgress(integer);
+//                                }
+//                            });
+//
+//                            animator.addListener(new Animator.AnimatorListener() {
+//                                int i = 0;
+//
+//                                @Override
+//                                public void onAnimationStart(Animator animation) {
+//
+//
+//                                }
+//
+//                                @Override
+//                                public void onAnimationEnd(Animator animation) {
+//                                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+//                                }
+//
+//                                @Override
+//                                public void onAnimationCancel(Animator animation) {
+//
+//                                }
+//
+//                                @Override
+//                                public void onAnimationRepeat(Animator animation) {
+//                                    i++;
+//                                    tvAlltimeRemain.setText("总剩余时间："
+//                                            + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[0] + mTimerShow[1])) / 60 + 1)
+//                                            + "min");
+//                                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                                            "FE"
+//                                                    + "01"
+//                                                    + "01"
+//                                                    + String.format("%02x", mTimerShow[0])
+//                                                    + String.format("%02x", mTimerShow[1])
+//                                                    + String.format("%02x", mTimerShow[2])
+//                                                    + "0" + modeSelect
+//                                                    + "00"
+//                                                    + "00"
+//                                                    + "00"
+//                                                    + "00"
+//                                                    + "00"
+//                                                    + "EF"
+//                                    );
+//
+//                                }
+//                            });
+//                            animator.start();
+//                            mIntervelTime = 0;
+//
+//                            //sendTimer();
+//                            btnStart.setBackgroundResource(R.drawable.btn_start_en);
+//                            start_en = !start_en;
+//                            task.cancel();
+//                        }
+//                        else if (start_en && mbyte[6] == 2){
+//                            animator.cancel();
+//                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                                    "FE"
+//                                            + "01"
+//                                            + "00"
+//                                            + String.format("%02x", mTimerShow[0])
+//                                            + String.format("%02x", mTimerShow[1])
+//                                            + String.format("%02x", mTimerShow[2])
+//                                            + "0" + modeSelect
+//                                            + "00"
+//                                            + "00"
+//                                            + "00"
+//                                            + "00"
+//                                            + "00"
+//                                            + "EF"
+//                            );
+//                            //sendTimer();
+//                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+//                            start_en = !start_en;
+//                            task.cancel();
+//                        }
+//
+//                        updateBattery(mbyte[2]);
+//                    }
+                            break;
+                        case MSG_QUEUE_DATE:
+                            Bundle queueyBundle = msg.getData();
+                            byte[] queuebyte = queueyBundle.getByteArray("datearray");
+                            for (int i = 0; i < queuebyte.length; i++) {
+                                BleQueue.offer(queuebyte[i]);
+                            }
+                            //Toast.makeText(MainActivity.this,"收到数据："+Arrays.toString(queuebyte),Toast.LENGTH_SHORT).show();
+
+                            if (BleQueue.size() >= 13) {
+                                int fe = BleQueue.peek();
+                                while (fe != -2) {
+                                    BleQueue.poll();
+                                    fe = BleQueue.peek();
+                                }
+                                if (BleQueue.size() >= 13) {
+                                    byte[] mgetByte = new byte[13];
+                                    for (int j = 0; j < 13; j++) {
+                                        mgetByte[j] = BleQueue.poll();
                                     }
-
-
-                                    // progressBar.setProgress(integer);
-                                }
-                            });
-
-                            animator.addListener(new Animator.AnimatorListener() {
-                                int i = 0;
-
-                                @Override
-                                public void onAnimationStart(Animator animation) {
-
-
+                                    Message message = Message.obtain();
+                                    message.what = MSG_SHOW_DATE;
+                                    Bundle dateBundle = new Bundle();
+                                    dateBundle.putByteArray("datearray", mgetByte);
+                                    message.setData(dateBundle);
+                                    HandlerBluMain.sendMessage(message);
+                                    //analyseData(mgetByte);
                                 }
 
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                                }
+                            }
 
-                                @Override
-                                public void onAnimationCancel(Animator animation) {
+//                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
+//
+//                    if (mbyte[4] > 0) {
+//                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
+//                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
+//                    } else {
+//                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
+//                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
+//                    }
+                            //Toast.makeText(MainActivity.this,""+mbyte[2],Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+            Looper.loop();
+            //super.run();
+        }
+    };
 
-                                }
+    private void analyseData(byte[] mgetByte) {
 
-                                @Override
-                                public void onAnimationRepeat(Animator animation) {
-                                    i++;
-                                    tvAlltimeRemain.setText("总剩余时间："
-                                            + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[0] + mTimerShow[1])) / 60 + 1)
-                                            + "min");
+
+        if (mgetByte[12] == -17) {
+
+            Toast.makeText(MainActivity.this, "获取数据：" + Arrays.toString(mgetByte), Toast.LENGTH_SHORT).show();
+            mbytecopy = mgetByte;
+            //Toast.makeText(MainActivity.this,Arrays.toString(mgetByte),Toast.LENGTH_SHORT).show();
+//            if (System.currentTimeMillis() - mIntervelTime < 15000) {
+            if (true) {
+                if (!start_en && mgetByte[6] == 1) {
+
+                    //sendCurrentSignal();
+                    mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
+                    mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
+                    mstop = 200 - mstart;
+                    //animator.end();
+                    animator.cancel();
+                    alltime = mTimerShow[0] * 60;
+                    tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + mTimerShow[0] + "min");
+                    animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
+                    animator.setRepeatCount((int) (mTimerShow[0] * 60.0f / (mTimerShow[1] + mTimerShow[2])));
+                    animator.setInterpolator(new LinearInterpolator());
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            int integer = (int) animator.getAnimatedValue();
+                            if (integer < mstart) {
+                                progressBar.setProgress((int) (integer * 70.0f / mstart));
+                                tvResttimeRemain.setText(getString(R.string.str_all_remain_time) + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                                if (integer % mratio == 0) {
                                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                                             "FE"
                                                     + "01"
@@ -361,21 +579,65 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                                     + "00"
                                                     + "EF"
                                     );
-
                                 }
-                            });
-                            animator.start();
-                            mIntervelTime = 0;
 
-                            //sendTimer();
-                            btnStart.setBackgroundResource(R.drawable.btn_start_en);
-                            start_en = !start_en;
-                        } else {
-                            animator.cancel();
+                            } else {
+                                progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
+                                tvResttimeRemain.setText("休息剩余时间" + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                                if (integer % mratio == 0 || integer == mstart) {
+                                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                            "FE"
+                                                    + "01"
+                                                    + "00"
+                                                    + String.format("%02x", mTimerShow[0])
+                                                    + String.format("%02x", mTimerShow[1])
+                                                    + String.format("%02x", mTimerShow[2])
+                                                    + "0" + modeSelect
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "00"
+                                                    + "EF"
+                                    );
+                                }
+                            }
+
+
+                            // progressBar.setProgress(integer);
+                        }
+                    });
+
+                    animator.addListener(new Animator.AnimatorListener() {
+                        int i = 0;
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                            start_en = false;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                            i++;
+                            tvAlltimeRemain.setText("总剩余时间："
+                                    + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[0] + mTimerShow[1])) / 60 + 1)
+                                    + "min");
                             startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                                     "FE"
                                             + "01"
-                                            + "00"
+                                            + "01"
                                             + String.format("%02x", mTimerShow[0])
                                             + String.format("%02x", mTimerShow[1])
                                             + String.format("%02x", mTimerShow[2])
@@ -387,34 +649,75 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                             + "00"
                                             + "EF"
                             );
-                            //sendTimer();
-                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                            start_en = !start_en;
+
                         }
-                    }
-//                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
-//
-//                    if (mbyte[4] > 0) {
-//                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
-//                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
-//                    } else {
-//                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
-//                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
-//                    }
-                    //Toast.makeText(MainActivity.this,""+mbyte[2],Toast.LENGTH_SHORT).show();
+                    });
+                    animator.start();
+                    mIntervelTime = 0;
+
+                    //sendTimer();
+                    btnStart.setBackgroundResource(R.drawable.btn_start_en);
+                    start_en = true;
+                    task.cancel();
+                } else if (start_en && mgetByte[6] == 2) {
+                    animator.cancel();
+                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                            "FE"
+                                    + "01"
+                                    + "00"
+                                    + String.format("%02x", mTimerShow[0])
+                                    + String.format("%02x", mTimerShow[1])
+                                    + String.format("%02x", mTimerShow[2])
+                                    + "0" + modeSelect
+                                    + "00"
+                                    + "00"
+                                    + "00"
+                                    + "00"
+                                    + "00"
+                                    + "EF"
+                    );
+                    //sendTimer();
+                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                    start_en = false;
+                    task.cancel();
+                }
+
+                updateBattery(mgetByte[2]);
             }
         }
-    };
+    }
+
+
+    private void updateBattery(byte mbattery) {
+        if (mbattery >= 0 && mbattery <= 100) {
+            if (mbattery > 69)
+                imgBattery.setImageResource(R.drawable.im_dianliang100);
+            else if (mbattery > 59)
+                imgBattery.setImageResource(R.drawable.im_dianliang80);
+            else if (mbattery > 39)
+                imgBattery.setImageResource(R.drawable.im_dianliang60);
+            else if (mbattery > 19)
+                imgBattery.setImageResource(R.drawable.im_dianliang40);
+            else if (mbattery > 9)
+                imgBattery.setImageResource(R.drawable.im_dianliang20);
+            else if (mbattery >= 0)
+                imgBattery.setImageResource(R.drawable.im_dianliang10);
+
+        } else {
+            //Toast.makeText(getActivity(), "发送的数据格式不对", Toast.LENGTH_LONG).show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         RequestPermissonUtil.mayRequestLocation(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_all);
         checkBLEFeature();
         ButterKnife.bind(this);
         init();
         initEvent();
+        thread.start();
     }
 
     //是否支持蓝牙
@@ -851,6 +1154,41 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 //        progressBar.setProgressIndicator(indicator);
 //        progressBar.setProgress(0);
 //        progressBar.setVisibility(View.VISIBLE);
+
+        lvBledeviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (start_en) {
+                    return;
+                }
+                if (isConnected) {
+                    if (lockName == deviceList.get(position).getName()) {
+                        return;
+                    } else {
+                        bleManager.closeBluetoothGatt();
+                        isConnected = false;
+                        btnBlu.setBackgroundResource(R.drawable.btn_blu_nor);
+                        tvBluText.setText(getString(R.string.string_blu_dis));
+                    }
+
+                }
+
+                dlAll.closeDrawer(llDrawer);
+                lockName = deviceList.get(position).getName();
+                connectDevice = deviceList.get(position);
+                HandlerBluMain.sendEmptyMessage(MSG_UPDATE_DEVICE_NAME);
+
+                String strble = tvBluText.getText().toString().trim();
+                if (strble.equals(getString(R.string.string_blu_dis))) {
+                    tvBluText.setText(R.string.string_blue_ing);
+                    connectNameDevice(lockName);
+                }
+            }
+        });
+
+
+
+
     }
 
     private void init() {
@@ -924,24 +1262,74 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         btnTimeTrainMinus.setVisibility(View.INVISIBLE);
         btnTimeTrainAdd.setVisibility(View.INVISIBLE);
 
-        for(int i =0 ; i<animator_hide.length;i++){
+        for (int i = 0; i < animator_hide.length; i++) {
             animator_hide[i].setDuration(5000);
             animator_hide[i].setRepeatCount(1);
         }
 
     }
 
+    /**
+     * 切换语言
+     *
+     * @param language
+     */
+
+    private void switchLanguage(String language) {
+
+        //设置应用语言类型
+
+        Resources resources = getResources();
+
+        Configuration config = resources.getConfiguration();
+
+        DisplayMetrics dm = resources.getDisplayMetrics();
+
+        if (language.equals("zh_simple")) {
+
+            config.locale = Locale.SIMPLIFIED_CHINESE;
+            btnChinese.setBackgroundColor(getResources().getColor(R.color.color_btn));
+
+        } else if (language.equals("en")) {
+
+            config.locale = Locale.ENGLISH;
+            btnEnglish.setBackgroundColor(getResources().getColor(R.color.color_btn));
+        } else {
+
+            config.locale = Locale.getDefault();
+
+        }
+
+        resources.updateConfiguration(config, dm);
+
+
+    }
+
+
     @Override
     protected void onDestroy() {
 
         bleManager.closeBluetoothGatt();
+        animator.cancel();
+
         super.onDestroy();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", Context.MODE_PRIVATE);
+        String language = sharedPreferences.getString("language", "zh_simple");
+        switchLanguage(language);
         bleManager.enableBluetooth();
+        if (isConnected) {
+            btnBlu.setBackgroundResource(R.drawable.btn_blu_press);
+            tvBluText.setText(R.string.string_blu_en);
+        } else {
+            tvBluText.setText(R.string.string_blu_dis);
+            btnBlu.setBackgroundResource(R.drawable.btn_blu_nor);
+        }
+        //thread.start();
     }
 
     private void connectNameDevice(final String deviceName) {
@@ -954,7 +1342,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     @Override
                     public void run() {
                         tvBluText.setText(R.string.string_blu_dis);
-                        Toast.makeText(MainActivity.this, "没有发现设备", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.str_no_find_bledevice), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -966,7 +1354,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
                     @Override
                     public void run() {
-                        Toast.makeText(MainActivity.this, "发现设备", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.str_no_find_bledevice), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -989,6 +1377,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         isConnected = true;
                         btnBlu.setBackgroundResource(R.drawable.btn_blu_press);
                         tvBluText.setText(R.string.string_blu_en);
+                        connectDevice = gatt.getDevice();
+                        showDeviceList(deviceList);
+
 
                     }
                 });
@@ -1004,6 +1395,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         btnBlu.setBackgroundResource(R.drawable.btn_blu_nor);
                         tvBluText.setText(R.string.string_blu_dis);
                         bleManager.closeBluetoothGatt();
+                        lockName = "";
+                        showDeviceList(deviceList);
+                        animator.cancel();
                     }
                 });
                 bleManager.handleException(exception);
@@ -1041,14 +1435,22 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     public void onSuccess(final BluetoothGattCharacteristic characteristic) {
                         Log.d(TAG, "notify success： " + '\n' + String.valueOf(HexUtil.encodeHex(characteristic.getValue())));
                         byte[] m_byte = characteristic.getValue();
-                        if (m_byte.length == 13) {
-                            Message message = Message.obtain();
-                            message.what = MSG_GET_DATE;
-                            Bundle dateBundle = new Bundle();
-                            dateBundle.putByteArray("datearray", m_byte);
-                            message.setData(dateBundle);
-                            HandlerBlu.sendMessage(message);
-                        }
+//                        if (m_byte.length == 13) {
+//
+//                            Message message = Message.obtain();
+//                            message.what = MSG_GET_DATE;
+//                            Bundle dateBundle = new Bundle();
+//                            dateBundle.putByteArray("datearray", m_byte);
+//                            message.setData(dateBundle);
+//                            HandlerBlu.sendMessage(message);
+//                        }
+
+                        Message message = Message.obtain();
+                        message.what = MSG_QUEUE_DATE;
+                        Bundle dateBundle = new Bundle();
+                        dateBundle.putByteArray("datearray", m_byte);
+                        message.setData(dateBundle);
+                        HandlerBlu.sendMessage(message);
 
 
                     }
@@ -1093,6 +1495,60 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
     }
 
+    /**
+     * 搜索周围蓝牙设备
+     */
+    private void scanDevice() {
+        if (bleManager.isInScanning())
+            return;
+
+        ProgressDialogUtils.getInstance().show(MainActivity.this, R.string.str_find_bledevice);
+
+        boolean en = bleManager.scanDevice(new ListScanCallback(15000) {
+
+
+            @Override
+            public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                super.onLeScan(device, rssi, scanRecord);
+            }
+
+            @Override
+            public void onScanTimeout() {
+                super.onScanTimeout();
+            }
+
+            @Override
+            public void onDeviceFound(final BluetoothDevice[] devices) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ProgressDialogUtils.getInstance().dismiss();
+//                        Toast.makeText(MainActivity.this,devices.length+"",Toast.LENGTH_SHORT).show();
+                        deviceList = new ArrayList<BluetoothDevice>(Arrays.asList(devices));
+
+                        if (isConnected) {
+
+                            deviceList.add(connectDevice);
+                        }
+                        showDeviceList(deviceList);
+
+                    }
+                });
+            }
+        });
+//        Toast.makeText(MainActivity.this,en+"",Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 显示蓝牙设备列表
+     */
+    private void showDeviceList(List<BluetoothDevice> deviceList) {
+        DeviceListAdapter deviceListAdapter = new DeviceListAdapter(MainActivity.this, deviceList, lockName);
+        lvBledeviceList.setAdapter(deviceListAdapter);
+//        deviceListAdapter.notifyDataSetChanged();
+
+    }
+
     @OnClick({R.id.btn_blu,
             R.id.btn_start,
             R.id.cirpro_arm,
@@ -1109,42 +1565,94 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             R.id.btn_controler_show,
             R.id.btn_rest_show,
             R.id.btn_train_show,
-//            R.id.gif_arm,
-//            R.id.gif_shoudler,
-//            R.id.gif_chest,
-//            R.id.gif_abdomen,
-//            R.id.gif_back,
-//            R.id.gif_waist,
-//            R.id.gif_hgigh_fore,
-//            R.id.gif_hgigh_back,
-//            R.id.gif_hips,
-//            R.id.gif_calf,
-//            R.id.btn_arm_minus,
-            //R.id.btn_arm_plus,
-//            R.id.btn_shoulder_minus, R.id.btn_shoulder_plus,
-//            R.id.btn_chest_minus, R.id.btn_chest_plus,
-//            R.id.btn_abdomen_minus, R.id.btn_abdomen_plus,
-//            R.id.btn_back_minus, R.id.btn_back_plus,
-//            R.id.btn_waist_minus, R.id.btn_waist_plus,
-//            R.id.btn_backthigh_minus, R.id.btn_backthigh_plus,
-//            R.id.btn_forethigh_minus, R.id.btn_forethigh_plus,
-//            R.id.btn_hips_minus, R.id.btn_hips_plus,
-//            R.id.btn_calfs_minus, R.id.btn_calfs_plus,
-//            R.id.imgbtn_all_minus, R.id.imgbtn_all_add,
-//            R.id.btn_time_all_minus, R.id.btn_time_all_add,
-//            R.id.btn_time_train_minus, R.id.btn_time_train_add,
-//            R.id.btn_time_rest_minus, R.id.btn_time_rest_add
+            R.id.btn_find_bledevice,
+            R.id.btn_open_drawer,
+            R.id.btn_chinese,
+            R.id.btn_english,
+            R.id.btn_about,
     })
     public void OnClick(View v) {
         switch (v.getId()) {
             case R.id.btn_blu:
                 if (!isConnected) {
+                    SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", Context.MODE_PRIVATE);
+                    lockName = sharedPreferences.getString("devicename", lockName);
                     String strble = tvBluText.getText().toString().trim();
-                    if (strble.equals("未连接")) {
+                    if (strble.equals(getString(R.string.string_blu_dis))) {
                         connectNameDevice(lockName);
                         tvBluText.setText(R.string.string_blue_ing);
                     }
                 }
+                break;
+            case R.id.btn_find_bledevice:
+                scanDevice();
+                break;
+            case R.id.btn_open_drawer:
+                dlAll.openDrawer(llDrawer);
+                break;
+            case R.id.btn_chinese:
+                bleManager.closeBluetoothGatt();
+                isConnected = false;
+                //获取一个文件名为test、权限为private的xml文件的SharedPreferences对象
+                SharedPreferences sharedPreferenceschinese = getSharedPreferences("weidianliu", MODE_PRIVATE);
+
+                //得到SharedPreferences.Editor对象，并保存数据到该对象中
+                SharedPreferences.Editor editorChinese = sharedPreferenceschinese.edit();
+                editorChinese.putString("language", "zh_simple");
+
+                //保存key-value对到文件中
+                editorChinese.commit();
+                switchLanguage("zh_simple");
+                //更新语言后，destroy当前页面，重新绘制
+
+                finish();
+
+                Intent itchinese = new Intent(MainActivity.this, MainActivity.class);
+
+                //清空任务栈确保当前打开activit为前台任务栈栈顶
+
+                itchinese.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                startActivity(itchinese);
+                break;
+            case R.id.btn_english:
+                bleManager.closeBluetoothGatt();
+                isConnected = false;
+                //获取一个文件名为test、权限为private的xml文件的SharedPreferences对象
+                SharedPreferences sharedPreferencesenglish = getSharedPreferences("weidianliu", MODE_PRIVATE);
+
+                //得到SharedPreferences.Editor对象，并保存数据到该对象中
+                SharedPreferences.Editor editorenglish = sharedPreferencesenglish.edit();
+                editorenglish.putString("language", "en");
+
+                //保存key-value对到文件中
+                editorenglish.commit();
+                switchLanguage("en");
+                //更新语言后，destroy当前页面，重新绘制
+
+                finish();
+
+                Intent itenglish = new Intent(MainActivity.this, MainActivity.class);
+
+                //清空任务栈确保当前打开activit为前台任务栈栈顶
+
+                itenglish.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                startActivity(itenglish);
+                break;
+            case R.id.btn_about:
+                Dialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
+                        .setTitle(getString(R.string.about))//设置标题
+                        .setMessage("hahahahahah？")//设置提示内容
+                        //确定按钮
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .create();//创建对话框
+                dialog.show();//显示对话框
                 break;
             case R.id.btn_start:
                 if (!start_en) {
@@ -1163,9 +1671,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                     + "00"
                                     + "EF"
                     );
-
-
-
 
 
                 } else {
@@ -1188,10 +1693,73 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
                 }
                 mIntervelTime = System.currentTimeMillis();
+                task.cancel();
+                task.setRepeatCount(5);
+                task.setDuration(1000);
+                task.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+//                        if(mbytecopy[6] ==0)
+//                        {
+                        if (!start_en) {
+                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                    "FE"
+                                            + "01"
+                                            + "01"
+                                            + String.format("%02x", mTimerShow[0])
+                                            + String.format("%02x", mTimerShow[1])
+                                            + String.format("%02x", mTimerShow[2])
+                                            + "0" + modeSelect
+                                            + "01"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "EF"
+                            );
+                        } else {
+                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                                    "FE"
+                                            + "01"
+                                            + "00"
+                                            + String.format("%02x", mTimerShow[0])
+                                            + String.format("%02x", mTimerShow[1])
+                                            + String.format("%02x", mTimerShow[2])
+                                            + "0" + modeSelect
+                                            + "02"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "00"
+                                            + "EF"
+                            );
+                        }
+
+//                        }
+                    }
+                });
+                task.start();
                 break;
             case R.id.cirpro_arm:
-                hideGif();
-                if(btnArmMinus.getVisibility() != View.VISIBLE){
+
+                if (btnArmMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnArmMinus.setVisibility(View.VISIBLE);
                     btnArmPlus.setVisibility(View.VISIBLE);
@@ -1202,8 +1770,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
 
             case R.id.cirpro_shoudler:
-                hideGif();
-                if(btnShoulderMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnShoulderMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnShoulderMinus.setVisibility(View.VISIBLE);
                     btnShoulderPlus.setVisibility(View.VISIBLE);
@@ -1212,8 +1782,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_chest:
-                hideGif();
-                if(btnChestMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnChestMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnChestMinus.setVisibility(View.VISIBLE);
                     btnChestPlus.setVisibility(View.VISIBLE);
@@ -1222,8 +1794,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_abdomen:
-                hideGif();
-                if(btnAbdomenMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnAbdomenMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnAbdomenMinus.setVisibility(View.VISIBLE);
                     btnAbdomenPlus.setVisibility(View.VISIBLE);
@@ -1232,8 +1806,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_back:
-                hideGif();
-                if(btnBackMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnBackMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnBackMinus.setVisibility(View.VISIBLE);
                     btnBackPlus.setVisibility(View.VISIBLE);
@@ -1242,8 +1818,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_waist:
-                hideGif();
-                if(btnWaistMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnWaistMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnWaistMinus.setVisibility(View.VISIBLE);
                     btnWaistPlus.setVisibility(View.VISIBLE);
@@ -1252,8 +1830,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_forethigh:
-                hideGif();
-                if(btnForethighMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnForethighMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnForethighMinus.setVisibility(View.VISIBLE);
                     btnForethighPlus.setVisibility(View.VISIBLE);
@@ -1262,8 +1842,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_backthigh:
-                hideGif();
-                if(btnBackthighMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnBackthighMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnBackthighMinus.setVisibility(View.VISIBLE);
                     btnBackthighPlus.setVisibility(View.VISIBLE);
@@ -1272,8 +1854,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_hips:
-                hideGif();
-                if(btnHipsMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnHipsMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnHipsPlus.setVisibility(View.VISIBLE);
                     btnHipsMinus.setVisibility(View.VISIBLE);
@@ -1282,8 +1866,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.cirpro_calfs:
-                hideGif();
-                if(btnCalfsMinus.getVisibility() != View.VISIBLE) {
+
+                if (btnCalfsMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnCalfsMinus.setVisibility(View.VISIBLE);
                     btnCalfsPlus.setVisibility(View.VISIBLE);
@@ -1292,7 +1878,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.imgbtn_all_show:
-                if(imgbtnAllMinus.getVisibility() != View.VISIBLE) {
+                if (imgbtnAllMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     imgbtnAllMinus.setVisibility(View.VISIBLE);
                     imgbtnAllAdd.setVisibility(View.VISIBLE);
@@ -1300,7 +1888,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.btn_controler_show:
-                if(btnTimeAllMinus.getVisibility() != View.VISIBLE) {
+                if (btnTimeAllMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnTimeAllMinus.setVisibility(View.VISIBLE);
                     btnTimeAllAdd.setVisibility(View.VISIBLE);
@@ -1308,7 +1898,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.btn_train_show:
-                if(btnTimeTrainMinus.getVisibility() != View.VISIBLE) {
+                if (btnTimeTrainMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnTimeTrainMinus.setVisibility(View.VISIBLE);
                     btnTimeTrainAdd.setVisibility(View.VISIBLE);
@@ -1316,7 +1908,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
                 break;
             case R.id.btn_rest_show:
-                if(btnTimeRestMinus.getVisibility() != View.VISIBLE) {
+                if (btnTimeRestMinus.getVisibility() != View.VISIBLE) {
+                    hideAllBtn();
+                    hideGif();
                     //animator_hide[0].cancel();
                     btnTimeRestMinus.setVisibility(View.VISIBLE);
                     btnTimeRestAdd.setVisibility(View.VISIBLE);
@@ -1500,17 +2094,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
     }
 
-    void hideGif(){
-        gifArm.setVisibility(View.GONE);
-        gifShoudler.setVisibility(View.GONE);
-        gifChest.setVisibility(View.GONE);
-        gifAbdomen.setVisibility(View.GONE);
-        gifBack.setVisibility(View.GONE);
-        gifWaist.setVisibility(View.GONE);
-        gifHgighFore.setVisibility(View.GONE);
-        gifHgighBack.setVisibility(View.GONE);
-        gifHips.setVisibility(View.GONE);
-        gifCalf.setVisibility(View.GONE);
+    void hideGif() {
+        gifArm.setVisibility(View.INVISIBLE);
+        gifShoudler.setVisibility(View.INVISIBLE);
+        gifChest.setVisibility(View.INVISIBLE);
+        gifAbdomen.setVisibility(View.INVISIBLE);
+        gifBack.setVisibility(View.INVISIBLE);
+        gifWaist.setVisibility(View.INVISIBLE);
+        gifHgighFore.setVisibility(View.INVISIBLE);
+        gifHgighBack.setVisibility(View.INVISIBLE);
+        gifHips.setVisibility(View.INVISIBLE);
+        gifCalf.setVisibility(View.INVISIBLE);
 
     }
 
@@ -1557,16 +2151,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "02"
-                        + String.format("%02x", mEveryRank[0]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[1]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[2]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[3]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[4]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[5]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[6]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[7]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[8]*mAllRank/100)
-                        + String.format("%02x", mEveryRank[9]*mAllRank/100)
+                        + String.format("%02x", mEveryRank[0] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[1] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[2] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[3] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[4] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[5] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[6] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[7] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[8] * mAllRank / 100)
+                        + String.format("%02x", mEveryRank[9] * mAllRank / 100)
                         + "EF"
         );
     }
@@ -1606,7 +2200,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
             case MotionEvent.ACTION_UP:
 
-                    sendInfor(v);
+                sendInfor(v);
 
 
                 break;
@@ -1655,7 +2249,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 sendCurrentSignal();
                 break;
             case R.id.btn_abdomen_plus:
-               // animator_hide[3].cancel();
+                // animator_hide[3].cancel();
                 animator_hide[3].start();
                 sendCurrentSignal();
                 break;
@@ -1672,7 +2266,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
 
             case R.id.btn_waist_minus:
-               // animator_hide[5].cancel();
+                // animator_hide[5].cancel();
                 animator_hide[5].start();
                 sendCurrentSignal();
                 break;
@@ -1682,17 +2276,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 sendCurrentSignal();
                 break;
             case R.id.btn_forethigh_minus:
-               // animator_hide[6].cancel();
+                // animator_hide[6].cancel();
                 animator_hide[6].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_forethigh_plus:
-               // animator_hide[6].cancel();
+                // animator_hide[6].cancel();
                 animator_hide[6].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_backthigh_minus:
-               // animator_hide[7].cancel();
+                // animator_hide[7].cancel();
                 animator_hide[7].start();
                 sendCurrentSignal();
                 break;
@@ -1702,12 +2296,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 sendCurrentSignal();
                 break;
             case R.id.btn_hips_minus:
-               // animator_hide[8].cancel();
+                // animator_hide[8].cancel();
                 animator_hide[8].start();
                 sendCurrentSignal();
                 break;
             case R.id.btn_hips_plus:
-               // animator_hide[8].cancel();
+                // animator_hide[8].cancel();
                 animator_hide[8].start();
                 sendCurrentSignal();
                 break;
@@ -1737,38 +2331,38 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
 
             case R.id.btn_time_all_minus:
-                if(!start_en)  break;
-               // animator_hide[11].cancel();
+                if (start_en) break;
+                // animator_hide[11].cancel();
                 animator_hide[11].start();
                 sendTimer();
 
                 break;
             case R.id.btn_time_all_add:
-                if(!start_en)  break;
-               // animator_hide[11].cancel();
+                if (start_en) break;
+                // animator_hide[11].cancel();
                 animator_hide[11].start();
                 sendTimer();
                 break;
             case R.id.btn_time_train_minus:
-                if(!start_en)  break;
-               // animator_hide[12].cancel();
+                if (start_en) break;
+                // animator_hide[12].cancel();
                 animator_hide[12].start();
                 sendTimer();
                 break;
             case R.id.btn_time_train_add:
-                if(!start_en)  break;
-               // animator_hide[12].cancel();
+                if (start_en) break;
+                // animator_hide[12].cancel();
                 animator_hide[12].start();
                 sendTimer();
                 break;
             case R.id.btn_time_rest_minus:
-                if(!start_en)  break;
-               // animator_hide[13].cancel();
+                if (start_en) break;
+                // animator_hide[13].cancel();
                 animator_hide[13].start();
                 sendTimer();
                 break;
             case R.id.btn_time_rest_add:
-                if(!start_en)  break;
+                if (start_en) break;
                 //animator_hide[13].cancel();
                 animator_hide[13].start();
                 sendTimer();
@@ -1915,42 +2509,42 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
 
             case R.id.btn_time_all_minus:
-                if(start_en) break;
-                if (mTimerShow[0] <= 5) break;
+                if (start_en) break;
+                if (mTimerShow[0] <= 0) break;
                 mTimerShow[0]--;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_all_add:
-                if(start_en) break;
+                if (start_en) break;
                 if (mTimerShow[0] >= 60) break;
                 mTimerShow[0]++;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_train_minus:
-                if(start_en) break;
-                if (mTimerShow[1] <= 5) break;
+                if (start_en) break;
+                if (mTimerShow[1] <= 0) break;
                 mTimerShow[1]--;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_train_add:
-                if(start_en) break;
+                if (start_en) break;
                 if (mTimerShow[1] >= 60) break;
                 mTimerShow[1]++;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_rest_minus:
-                if(start_en) break;
-                if (mTimerShow[2] <= 5) break;
+                if (start_en) break;
+                if (mTimerShow[2] <= 0) break;
                 mTimerShow[2]--;
                 btnRestShow.setText(mTimerShow[2] + "");
 
                 break;
             case R.id.btn_time_rest_add:
-                if(start_en) break;
+                if (start_en) break;
                 if (mTimerShow[2] >= 70) break;
                 mTimerShow[2]++;
                 btnRestShow.setText(mTimerShow[2] + "");
@@ -1961,8 +2555,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
 
-    void hideAllBtn()
-    {
+    void hideAllBtn() {
         btnArmPlus.setVisibility(View.INVISIBLE);
         btnArmMinus.setVisibility(View.INVISIBLE);
 

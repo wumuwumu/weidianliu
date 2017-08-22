@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Back_of_the_thigh">back of the thigh</string>
+    <string name="Thigh_front_side">thigh front side</string>
+    <string name="abdomen">abdomen</string>
+    <string name="arm">arm</string>
+    <string name="app_name">Micro current</string>
+    <string name="back">back</string>
+    <string name="ble_not_supported">Your phone does not support Bluetooth functionality</string>
+    <string name="calf">calf</string>
+    <string name="chest">chest</string>
+    <string name="error_bluetooth_not_supported">Your phone does not support Bluetooth functionality</string>
+    <string name="hips">hips</string>
+    <string name="shoudler">shoudler</string>
+    <string name="str_all_remain_time">Total time surplus:</string>
+    <string name="str_find_bledevice">Looking for Bluetooth devices</string>
+    <string name="str_language">Language</string>
+    <string name="str_train_remain_time">Movement residual time:</string>
+    <string name="string_alltime">All time</string>
+    <string name="string_blu_dis">Disconnected</string>
+    <string name="string_blu_en">Connected</string>
+    <string name="string_blue_ing">Connecting</string>
+    <string name="string_mode_aerobic">Aerobic model</string>
+    <string name="string_mode_anoxic">Anaerobic mode</string>
+    <string name="string_mode_massage">Massage mode</string>
+    <string name="string_rest_time">Rest time</string>
+    <string name="string_train_time">Train time</string>
+    <string name="waist">waist</string>
+    <string name="about">about</string>
+    <string name="str_no_find_bledevice">Not look for Bluetooth device</string>
+    <string name="str_device">devicename：</string>
+</resources>

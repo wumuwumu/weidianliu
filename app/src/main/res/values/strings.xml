@@ -5,6 +5,22 @@
     <string name="string_train_time">运动时间</string>
     <string name="string_rest_time">休息时间</string>
 
+    <string name="str_all_remain_time">总时间剩余:</string>
+    <string name="str_train_remain_time">运动剩余时间：</string>
+
+    <string name="arm">胳膊</string>
+    <string name="shoudler">肩膀</string>
+    <string name="chest">胸部</string>
+    <string name="abdomen">胸部</string>
+    <string name="back">背部</string>
+
+    <string name="waist">腰部</string>
+    <string name="Thigh_front_side">大腿前侧</string>
+    <string name="Back_of_the_thigh">大腿后侧</string>
+    <string name="hips">臀部</string>
+    <string name="calf">小腿</string>
+
+
     <string name="string_mode_aerobic">有氧模式</string>
     <string name="string_mode_anoxic">无氧模式</string>
     <string name="string_mode_massage">按摩模式</string>
@@ -15,4 +31,11 @@
 
     <string name="error_bluetooth_not_supported">您的手机不支持蓝牙功能</string>
     <string name="ble_not_supported">您的手机不支持蓝牙功能</string>
+
+    <string name="str_find_bledevice">寻找蓝牙设备</string>
+    <string name="str_no_find_bledevice">没有找到蓝牙设备</string>
+
+    <string name="str_language">语言</string>
+    <string name="about">关于</string>
+    <string name="str_device">设备：</string>
 </resources>

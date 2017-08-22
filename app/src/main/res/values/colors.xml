@@ -39,4 +39,7 @@
     <color name="white">#ffffff</color>
 
     <color name="black">#000000</color>
+
+    <color name="color_btn">#09b58a</color>
+    <color name="color_about">#333333</color>
 </resources>
