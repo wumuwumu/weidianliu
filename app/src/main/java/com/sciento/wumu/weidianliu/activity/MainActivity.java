@@ -1532,6 +1532,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 if (mTimerShow[1] == 0 && mTimerShow[2] == 0) {
                     break;
                 }
+                sendCurrentSignal();
                 if (!start_en) {
                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                             "FE"
@@ -1891,6 +1892,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     //发送的等级百分比所有的状态
     private void sendCurrentSignal() {
+        sendSignal();
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                sendSignal();
+            }
+        }, 100);
+    }
+
+    private void sendSignal() {
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "02"
@@ -1907,9 +1917,44 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         + "EF"
         );
     }
-
     //发送定时
     private void sendTimer() {
+        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                "FE"
+                        + "01"
+//                        + "0" + (mAllRank == 0 ? 0 : 1)
+                        + "00"
+                        + String.format("%02x", mTimerShow[0])
+                        + String.format("%02x", mTimerShow[1])
+                        + String.format("%02x", mTimerShow[2])
+                        + "0" + modeSelect
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "EF"
+        );
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                        "FE"
+                                + "01"
+//                        + "0" + (mAllRank == 0 ? 0 : 1)
+                                + "00"
+                                + String.format("%02x", mTimerShow[0])
+                                + String.format("%02x", mTimerShow[1])
+                                + String.format("%02x", mTimerShow[2])
+                                + "0" + modeSelect
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "EF"
+                );
+            }
+        }, 100);
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "01"
@@ -1929,6 +1974,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
 
+    //长按按钮
     @Override
     public void repeatAction(View view) {
         updateControlData(view);
