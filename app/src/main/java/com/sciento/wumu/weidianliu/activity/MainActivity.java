@@ -51,6 +51,7 @@ import com.sciento.wumu.weidianliu.R;
 import com.sciento.wumu.weidianliu.adapter.DeviceListAdapter;
 import com.sciento.wumu.weidianliu.utils.ProgressDialogUtils;
 import com.sciento.wumu.weidianliu.utils.RequestPermissonUtil;
+import com.sciento.wumu.weidianliu.view.CircleProgressView;
 import com.sciento.wumu.weidianliu.view.LongClickButton;
 
 import java.lang.reflect.Array;
@@ -68,7 +69,7 @@ import butterknife.OnClick;
 import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends AppCompatActivity implements CompoundButton.OnClickListener, LongClickButton.LongClickRepeatListener,
-        View.OnTouchListener {
+        View.OnTouchListener, View.OnLongClickListener {
 
 
     private static final String TAG = "MainActivity";
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public static BleManager bleManager;
     //animator
     final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
+
+    //隐藏动画
     final ValueAnimator[] animator_hide = {
             ValueAnimator.ofInt(0, 20),
             ValueAnimator.ofInt(0, 20),
@@ -102,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private final int MSG_QUEUE_DATE = 2;
     private final int MSG_SHOW_DATE = 1;
     private final int MSG_UPDATE_DEVICE_NAME = 3;
-    @BindView(R.id.btn_open_drawer)
-    Button btnOpenDrawer;
+
     @BindView(R.id.ll_drawer)
     LinearLayout llDrawer;
     @BindView(R.id.dl_all)
@@ -266,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     ImageView imgBattery;
     //显示值
     int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int mAllRank = 0;
+    int mAllRank = 100;
     //timer
     int[] mTimerShow = {1, 0, 0};
 
@@ -279,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     //all switch
     boolean start_en = false;
+    boolean startPressIs = false;
 
     int mallRankCopy = 0;
     int mstart = 0;
@@ -294,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     @BindView(R.id.lv_bledevice_list)
     ListView lvBledeviceList;
     byte[] mbytecopy = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    List<CircleProgressBar> circleProgressBarList = new ArrayList<>();
     @BindView(R.id.btn_about)
     Button btnAbout;
     //    private String lockName = "BlakBat";
@@ -301,6 +305,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private BluetoothAdapter mBluetoothAdapter;
     private boolean isConnected = false;
     private Handler HandlerBlu;
+
+
+    //主线程进行数据的处理
     private Handler HandlerBluMain = new Handler() {
 
         @Override
@@ -311,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     byte[] queuebyte = queueyBundle.getByteArray("datearray");
                     analyseData(queuebyte);
                     break;
+                //保存蓝牙连接的名字
                 case MSG_UPDATE_DEVICE_NAME:
                     //获取一个文件名为test、权限为private的xml文件的SharedPreferences对象
                     SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", MODE_PRIVATE);
@@ -324,9 +332,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     break;
             }
 
-            //super.handleMessage(msg);
+            super.handleMessage(msg);
         }
     };
+
+    //在其他线程处理处理数据
     Thread thread = new Thread() {
 
         @Override
@@ -337,153 +347,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 public void handleMessage(Message msg) {
                     switch (msg.what) {
                         case MSG_GET_DATE:
-//                    Bundle myBundle = msg.getData();
-//
-//                    byte[] mbyte = myBundle.getByteArray("datearray");
-//                    Toast.makeText(MainActivity.this, Arrays.toString(mbyte),Toast.LENGTH_SHORT).show();
-//                    mbytecopy = mbyte;
-//                    if (System.currentTimeMillis() - mIntervelTime < 5000) {
-//                        if (!start_en && mbyte[6] == 1) {
-//
-//                            //sendCurrentSignal();
-//                            mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
-//                            mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
-//                            mstop = 200 - mstart;
-//                            //animator.end();
-//                            animator.cancel();
-//                            alltime = mTimerShow[0] * 60;
-//                            tvAlltimeRemain.setText("总剩余时间：" + mTimerShow[0] + "min");
-//                            animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
-//                            animator.setRepeatCount((int) (mTimerShow[0] * 60.0f / (mTimerShow[1] + mTimerShow[2])));
-//                            animator.setInterpolator(new LinearInterpolator());
-//                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                                @Override
-//                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                                    int integer = (int) animator.getAnimatedValue();
-//                                    if (integer < mstart) {
-//                                        progressBar.setProgress((int) (integer * 70.0f / mstart));
-//                                        tvResttimeRemain.setText("运动剩余时间：" + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-//                                        if (integer % mratio == 0) {
-//                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-//                                                    "FE"
-//                                                            + "01"
-//                                                            + "01"
-//                                                            + String.format("%02x", mTimerShow[0])
-//                                                            + String.format("%02x", mTimerShow[1])
-//                                                            + String.format("%02x", mTimerShow[2])
-//                                                            + "0" + modeSelect
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "EF"
-//                                            );
-//                                        }
-//
-//                                    } else {
-//                                        progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
-//                                        tvResttimeRemain.setText("休息剩余时间" + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-//                                        if (integer % mratio == 0 || integer == mstart) {
-//                                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-//                                                    "FE"
-//                                                            + "01"
-//                                                            + "00"
-//                                                            + String.format("%02x", mTimerShow[0])
-//                                                            + String.format("%02x", mTimerShow[1])
-//                                                            + String.format("%02x", mTimerShow[2])
-//                                                            + "0" + modeSelect
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "00"
-//                                                            + "EF"
-//                                            );
-//                                        }
-//                                    }
-//
-//
-//                                    // progressBar.setProgress(integer);
-//                                }
-//                            });
-//
-//                            animator.addListener(new Animator.AnimatorListener() {
-//                                int i = 0;
-//
-//                                @Override
-//                                public void onAnimationStart(Animator animation) {
-//
-//
-//                                }
-//
-//                                @Override
-//                                public void onAnimationEnd(Animator animation) {
-//                                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-//                                }
-//
-//                                @Override
-//                                public void onAnimationCancel(Animator animation) {
-//
-//                                }
-//
-//                                @Override
-//                                public void onAnimationRepeat(Animator animation) {
-//                                    i++;
-//                                    tvAlltimeRemain.setText("总剩余时间："
-//                                            + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[0] + mTimerShow[1])) / 60 + 1)
-//                                            + "min");
-//                                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-//                                            "FE"
-//                                                    + "01"
-//                                                    + "01"
-//                                                    + String.format("%02x", mTimerShow[0])
-//                                                    + String.format("%02x", mTimerShow[1])
-//                                                    + String.format("%02x", mTimerShow[2])
-//                                                    + "0" + modeSelect
-//                                                    + "00"
-//                                                    + "00"
-//                                                    + "00"
-//                                                    + "00"
-//                                                    + "00"
-//                                                    + "EF"
-//                                    );
-//
-//                                }
-//                            });
-//                            animator.start();
-//                            mIntervelTime = 0;
-//
-//                            //sendTimer();
-//                            btnStart.setBackgroundResource(R.drawable.btn_start_en);
-//                            start_en = !start_en;
-//                            task.cancel();
-//                        }
-//                        else if (start_en && mbyte[6] == 2){
-//                            animator.cancel();
-//                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-//                                    "FE"
-//                                            + "01"
-//                                            + "00"
-//                                            + String.format("%02x", mTimerShow[0])
-//                                            + String.format("%02x", mTimerShow[1])
-//                                            + String.format("%02x", mTimerShow[2])
-//                                            + "0" + modeSelect
-//                                            + "00"
-//                                            + "00"
-//                                            + "00"
-//                                            + "00"
-//                                            + "00"
-//                                            + "EF"
-//                            );
-//                            //sendTimer();
-//                            btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-//                            start_en = !start_en;
-//                            task.cancel();
-//                        }
-//
-//                        updateBattery(mbyte[2]);
-//                    }
                             break;
                         case MSG_QUEUE_DATE:
                             Bundle queueyBundle = msg.getData();
@@ -514,37 +377,22 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                 }
 
                             }
-
-//                    tvAlltimeRemain.setText("总剩余时间：" + mbyte[3]+"min");
-//
-//                    if (mbyte[4] > 0) {
-//                        progressBar.setProgress((int) (70 - (int)(mbyte[4] / (float) mTimerShow[1] * 70.0f)));
-//                        tvResttimeRemain.setText("运动剩余时间：" + mbyte[4]+"s");
-//                    } else {
-//                        progressBar.setProgress((int) (mbyte[5] / (float) mTimerShow[2] * 70.0f));
-//                        tvResttimeRemain.setText("休息剩余时间" + mbyte[5]+"s");
-//                    }
-                            //Toast.makeText(MainActivity.this,""+mbyte[2],Toast.LENGTH_SHORT).show();
                     }
                 }
             };
             Looper.loop();
-            //super.run();
         }
     };
 
     private void analyseData(byte[] mgetByte) {
 
-
         if (mgetByte[12] == -17) {
 
-            Toast.makeText(MainActivity.this, "获取数据：" + Arrays.toString(mgetByte), Toast.LENGTH_SHORT).show();
-            mbytecopy = mgetByte;
-            //Toast.makeText(MainActivity.this,Arrays.toString(mgetByte),Toast.LENGTH_SHORT).show();
-//            if (System.currentTimeMillis() - mIntervelTime < 15000) {
-            if (true) {
-                if (!start_en && mgetByte[6] == 1) {
 
+            if (!start_en && mgetByte[6] == 1 && startPressIs == true) {
+                startPressIs = false;
+                task.cancel();
+                start_en = true;
                     //sendCurrentSignal();
                     mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
                     mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
@@ -554,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     alltime = mTimerShow[0] * 60;
                     tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + mTimerShow[0] + "min");
                     animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
-                    animator.setRepeatCount((int) (mTimerShow[0] * 60.0f / (mTimerShow[1] + mTimerShow[2])));
+                animator.setRepeatCount((int) (mTimerShow[0] * 60.0 / (mTimerShow[1] + mTimerShow[2])));
                     animator.setInterpolator(new LinearInterpolator());
                     animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
@@ -620,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                            tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
                             start_en = false;
                         }
 
@@ -631,9 +480,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         @Override
                         public void onAnimationRepeat(Animator animation) {
                             i++;
-                            tvAlltimeRemain.setText("总剩余时间："
-                                    + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[0] + mTimerShow[1])) / 60 + 1)
+                            tvAlltimeRemain.setText(getString(R.string.str_train_remain_time)
+                                    + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[1] + mTimerShow[2])) / 60 + 1)
                                     + "min");
+//                            
                             startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                                     "FE"
                                             + "01"
@@ -655,11 +505,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     animator.start();
                     mIntervelTime = 0;
 
-                    //sendTimer();
                     btnStart.setBackgroundResource(R.drawable.btn_start_en);
-                    start_en = true;
-                    task.cancel();
-                } else if (start_en && mgetByte[6] == 2) {
+
+
+            } else if (start_en && mgetByte[6] == 2) {
+                //停止发送
+                startPressIs = false;
                     animator.cancel();
                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                             "FE"
@@ -682,8 +533,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     task.cancel();
                 }
 
+            //更新电量
                 updateBattery(mgetByte[2]);
-            }
+
         }
     }
 
@@ -704,7 +556,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 imgBattery.setImageResource(R.drawable.im_dianliang10);
 
         } else {
-            //Toast.makeText(getActivity(), "发送的数据格式不对", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -744,6 +595,18 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         tvAnoxic.setOnClickListener(this);
         tvMassage.setOnClickListener(this);
 
+
+        //长按清零时间
+        cirproArm.setOnLongClickListener(this);
+        cirproChest.setOnLongClickListener(this);
+        cirproShoudler.setOnLongClickListener(this);
+        cirproCalfs.setOnLongClickListener(this);
+        cirproHips.setOnLongClickListener(this);
+        cirproAbdomen.setOnLongClickListener(this);
+        cirproBack.setOnLongClickListener(this);
+        cirproBackthigh.setOnLongClickListener(this);
+        cirproForethigh.setOnLongClickListener(this);
+        cirproWaist.setOnLongClickListener(this);
 
         //arm
         btnArmMinus.setLongClickRepeatListener(this, 50);
@@ -1192,6 +1055,21 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     private void init() {
+
+        circleProgressBarList.add(0, cirproArm);
+        circleProgressBarList.add(1, cirproShoudler);
+        circleProgressBarList.add(2, cirproChest);
+        circleProgressBarList.add(3, cirproAbdomen);
+        circleProgressBarList.add(4, cirproBack);
+        circleProgressBarList.add(5, cirproWaist);
+        circleProgressBarList.add(6, cirproForethigh);
+        circleProgressBarList.add(7, cirproBackthigh);
+        circleProgressBarList.add(8, cirproHips);
+        circleProgressBarList.add(9, cirproCalfs);
+
+
+
+
         cirproArm.setProgress(mEveryRank[0]);
         cirproShoudler.setProgress(mEveryRank[1]);
         cirproChest.setProgress(mEveryRank[2]);
@@ -1407,7 +1285,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         });
     }
 
-    //初始化
+    //蓝牙初始化
     private void initConnect(String deviceName, BluetoothGatt gatt) {
         bleManager.getBluetoothState();
         if (gatt != null) {
@@ -1536,7 +1414,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 });
             }
         });
-//        Toast.makeText(MainActivity.this,en+"",Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -1549,6 +1426,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     }
 
+    //按钮的点击事件
     @OnClick({R.id.btn_blu,
             R.id.btn_start,
             R.id.cirpro_arm,
@@ -1566,7 +1444,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             R.id.btn_rest_show,
             R.id.btn_train_show,
             R.id.btn_find_bledevice,
-            R.id.btn_open_drawer,
             R.id.btn_chinese,
             R.id.btn_english,
             R.id.btn_about,
@@ -1586,9 +1463,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
             case R.id.btn_find_bledevice:
                 scanDevice();
-                break;
-            case R.id.btn_open_drawer:
-                dlAll.openDrawer(llDrawer);
                 break;
             case R.id.btn_chinese:
                 bleManager.closeBluetoothGatt();
@@ -1655,6 +1529,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 dialog.show();//显示对话框
                 break;
             case R.id.btn_start:
+                if (mTimerShow[1] == 0 && mTimerShow[2] == 0) {
+                    break;
+                }
                 if (!start_en) {
                     startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                             "FE"
@@ -1692,8 +1569,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
 
                 }
+
                 mIntervelTime = System.currentTimeMillis();
                 task.cancel();
+//                重复发送，等待回复
                 task.setRepeatCount(5);
                 task.setDuration(1000);
                 task.addListener(new Animator.AnimatorListener() {
@@ -1749,10 +1628,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                                             + "EF"
                             );
                         }
-
-//                        }
                     }
                 });
+                startPressIs = true;
                 task.start();
                 break;
             case R.id.cirpro_arm:
@@ -1917,183 +1795,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     animator_hide[13].start();
                 }
                 break;
-//            case R.id.btn_arm_minus:
-//                if (mEveryRank[0] <= 0) break;
-//                mEveryRank[0]--;
-//                cirproArm.setProgress(mEveryRank[0]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_arm_plus:
-//                if (mEveryRank[0] >= 100) break;
-//                mEveryRank[0]++;
-//                cirproArm.setProgress(mEveryRank[0]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_shoulder_minus:
-//                if (mEveryRank[1] <= 0) break;
-//                mEveryRank[1]--;
-//                cirproShoudler.setProgress(mEveryRank[1]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_shoulder_plus:
-//                if (mEveryRank[1] >= 100) break;
-//                mEveryRank[1]++;
-//                cirproShoudler.setProgress(mEveryRank[1]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_chest_minus:
-//                if (mEveryRank[2] <= 0) break;
-//                mEveryRank[2]--;
-//                cirproChest.setProgress(mEveryRank[2]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_chest_plus:
-//                if (mEveryRank[2] >= 100) break;
-//                mEveryRank[2]++;
-//                cirproChest.setProgress(mEveryRank[2]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_abdomen_minus:
-//                if (mEveryRank[3] <= 0) break;
-//                mEveryRank[3]--;
-//                cirproAbdomen.setProgress(mEveryRank[3]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_abdomen_plus:
-//                if (mEveryRank[3] >= 100) break;
-//                mEveryRank[3]++;
-//                cirproAbdomen.setProgress(mEveryRank[3]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_back_minus:
-//                if (mEveryRank[4] <= 0) break;
-//                mEveryRank[4]--;
-//                cirproBack.setProgress(mEveryRank[4]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_back_plus:
-//                if (mEveryRank[4] >= 100) break;
-//                mEveryRank[4]++;
-//                cirproBack.setProgress(mEveryRank[4]);
-//                sendCurrentSignal();
-//                break;
-//
-//
-//            case R.id.btn_waist_minus:
-//                if (mEveryRank[5] <= 0) break;
-//                mEveryRank[5]--;
-//                cirproWaist.setProgress(mEveryRank[5]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_waist_plus:
-//                if (mEveryRank[5] >= 100) break;
-//                mEveryRank[5]++;
-//                cirproWaist.setProgress(mEveryRank[5]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_forethigh_minus:
-//                if (mEveryRank[6] <= 0) break;
-//                mEveryRank[6]--;
-//                cirproForethigh.setProgress(mEveryRank[6]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_forethigh_plus:
-//                if (mEveryRank[6] >= 100) break;
-//                mEveryRank[6]++;
-//                cirproForethigh.setProgress(mEveryRank[6]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_backthigh_minus:
-//                if (mEveryRank[7] <= 0) break;
-//                mEveryRank[7]--;
-//                cirproBackthigh.setProgress(mEveryRank[7]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_backthigh_plus:
-//                if (mEveryRank[7] >= 100) break;
-//                mEveryRank[7]++;
-//                cirproBackthigh.setProgress(mEveryRank[7]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_hips_minus:
-//                if (mEveryRank[8] <= 0) break;
-//                mEveryRank[8]--;
-//                cirproHips.setProgress(mEveryRank[8]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_hips_plus:
-//                if (mEveryRank[8] >= 100) break;
-//                mEveryRank[8]++;
-//                cirproHips.setProgress(mEveryRank[8]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_calfs_minus:
-//                if (mEveryRank[9] <= 0) break;
-//                mEveryRank[9]--;
-//                cirproCalfs.setProgress(mEveryRank[9]);
-//                sendCurrentSignal();
-//                break;
-//            case R.id.btn_calfs_plus:
-//                if (mEveryRank[9] >= 100) break;
-//                mEveryRank[9]++;
-//                cirproCalfs.setProgress(mEveryRank[9]);
-//                sendCurrentSignal();
-//                break;
-//
-//
-//            case R.id.imgbtn_all_minus:
-//                if (mAllRank <= 0) break;
-//                mAllRank--;
-//                imgbtnAllShow.setText(mAllRank + "");
-//                sendCurrentSignal();
-//                break;
-//            case R.id.imgbtn_all_add:
-//                if (mAllRank >= 100) break;
-//                mAllRank++;
-//                imgbtnAllShow.setText(mAllRank + "");
-//                sendCurrentSignal();
-//                break;
-//
-//            case R.id.btn_time_all_minus:
-//                if (mTimerShow[0] <= 5) break;
-//                mTimerShow[0]--;
-//                btnControlerShow.setText(mTimerShow[0] + "");
-//                sendTimer();
-//                break;
-//            case R.id.btn_time_all_add:
-//                if (mTimerShow[0] >= 60) break;
-//                mTimerShow[0]++;
-//                btnControlerShow.setText(mTimerShow[0] + "");
-//                sendTimer();
-//                break;
-//            case R.id.btn_time_train_minus:
-//                if (mTimerShow[1] <= 0) break;
-//                mTimerShow[1]--;
-//                btnTrainShow.setText(mTimerShow[1] + "");
-//                sendTimer();
-//                break;
-//            case R.id.btn_time_train_add:
-//                if (mTimerShow[1] >= 60) break;
-//                mTimerShow[1]++;
-//                btnTrainShow.setText(mTimerShow[1] + "");
-//                sendTimer();
-//                break;
-//            case R.id.btn_time_rest_minus:
-//                if (mTimerShow[2] <= 0) break;
-//                mTimerShow[2]--;
-//                btnRestShow.setText(mTimerShow[2] + "");
-//                sendTimer();
-//                break;
-//            case R.id.btn_time_rest_add:
-//                if (mTimerShow[2] >= 70) break;
-//                mTimerShow[2]++;
-//                btnRestShow.setText(mTimerShow[2] + "");
-//                progressBar.setProgress(mTimerShow[2]);
-//                sendTimer();
-//                break;
         }
     }
 
+    //隐藏那些显示的按钮
     void hideGif() {
         gifArm.setVisibility(View.INVISIBLE);
         gifShoudler.setVisibility(View.INVISIBLE);
@@ -2108,7 +1813,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     }
 
-
+    //修改模式
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -2141,12 +1846,50 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+            case R.id.cirpro_arm:
+                return updateRangeBtnValue(0, 0);
+            case R.id.cirpro_shoudler:
+                return updateRangeBtnValue(1, 0);
+            case R.id.cirpro_chest:
+                return updateRangeBtnValue(2, 0);
+            case R.id.cirpro_abdomen:
+                return updateRangeBtnValue(3, 0);
+            case R.id.cirpro_back:
+                return updateRangeBtnValue(4, 0);
+            case R.id.cirpro_waist:
+                return updateRangeBtnValue(5, 0);
+            case R.id.cirpro_forethigh:
+                return updateRangeBtnValue(6, 0);
+            case R.id.cirpro_backthigh:
+                return updateRangeBtnValue(7, 0);
+            case R.id.cirpro_hips:
+                return updateRangeBtnValue(8, 0);
+            case R.id.cirpro_calfs:
+                return updateRangeBtnValue(9, 0);
+
+        }
+        return false;
+    }
+
+    //清理并发送数据
+    private boolean updateRangeBtnValue(int btn, int value) {
+        mEveryRank[btn] = 0;
+        circleProgressBarList.get(btn).setProgress(0);
+        sendCurrentSignal();
+        return true;
+    }
+
+    //初始化模式
     private void initSwitch() {
         switchAerobic.setChecked(false);
         switchAnoxic.setChecked(false);
         switchMassage.setChecked(false);
     }
 
+    //发送的等级百分比所有的状态
     private void sendCurrentSignal() {
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
@@ -2165,6 +1908,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         );
     }
 
+    //发送定时
     private void sendTimer() {
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
@@ -2199,10 +1943,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 updateControlData(v);
                 break;
             case MotionEvent.ACTION_UP:
-
                 sendInfor(v);
-
-
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
@@ -2211,6 +1952,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
 
+    //判断按钮的的状态，发送数据
     void sendInfor(View v) {
         switch (v.getId()) {
             case R.id.btn_arm_minus:
@@ -2598,4 +2340,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         btnTimeTrainMinus.setVisibility(View.INVISIBLE);
         btnTimeTrainAdd.setVisibility(View.INVISIBLE);
     }
+
+
 }
