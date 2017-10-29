@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">微电流</string>
-    
-    <string name="string_alltime">总时间</string>
-    <string name="string_train_time">运动时间</string>
-    <string name="string_rest_time">休息时间</string>
+
+    <string name="string_alltime">总时间(min):</string>
+    <string name="string_train_time">运动时间(s):</string>
+    <string name="string_rest_time">休息时间(s):</string>
 
     <string name="str_all_remain_time">总时间剩余:</string>
     <string name="str_train_remain_time">运动剩余时间：</string>
@@ -11,7 +11,7 @@
     <string name="arm">胳膊</string>
     <string name="shoudler">肩膀</string>
     <string name="chest">胸部</string>
-    <string name="abdomen">胸部</string>
+    <string name="abdomen">腹部</string>
     <string name="back">背部</string>
 
     <string name="waist">腰部</string>
