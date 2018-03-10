@@ -18,6 +18,7 @@
         android:paddingLeft="20dp"
         android:text="@string/str_all_remain_time"
         android:textColor="@color/white"
+        android:textSize="8pt"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/progressBar"
@@ -35,6 +36,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/str_train_remain_time"
         android:textColor="@color/white"
+        android:textSize="8pt"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintHorizontal_bias="0.89"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -55,7 +57,7 @@
         android:max="70"
         android:paddingLeft="20dp"
         android:paddingRight="40dp"
-        android:progress="60"
+        android:progress="0"
         android:progressDrawable="@drawable/progress_layerlist"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.013"
@@ -121,7 +123,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/arm"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--left  shoulder-->
         <LinearLayout
@@ -159,7 +162,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/shoudler"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--chest-->
         <LinearLayout
@@ -196,7 +200,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/chest"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--abdomen left-->
         <LinearLayout
@@ -270,7 +275,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/back"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
     </LinearLayout>
 
 
@@ -323,7 +329,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/waist"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--forethigh right-->
         <LinearLayout
@@ -359,7 +366,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/Thigh_front_side"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--backthigh right-->
         <LinearLayout
@@ -397,7 +405,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/Back_of_the_thigh"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--hips right-->
         <LinearLayout
@@ -433,7 +442,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/hips"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <!--calf right-->
         <LinearLayout
@@ -469,7 +479,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/calf"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
     </LinearLayout>
 
     <!--image -->
@@ -485,7 +496,7 @@
         app:layout_constraintLeft_toRightOf="@+id/all_left"
         app:layout_constraintRight_toLeftOf="@+id/all_right"
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.100000024" />
+        app:layout_constraintVertical_bias="0.14999998" />
 
     <LinearLayout
         android:id="@+id/llo_all_controller"
@@ -549,7 +560,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/string_alltime"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -557,7 +569,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/string_train_time"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -565,7 +578,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/string_rest_time"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
     </LinearLayout>
 
     <!--time-->
@@ -657,18 +671,19 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintHorizontal_bias="0.74"
         app:layout_constraintLeft_toRightOf="@+id/progressBar"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.01999998">
+        app:layout_constraintVertical_bias="0.100000024">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/string_mode_aerobic"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <FrameLayout
             android:layout_width="60dp"
@@ -696,7 +711,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/string_mode_anoxic"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <FrameLayout
             android:layout_width="60dp"
@@ -722,7 +738,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/string_mode_massage"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
 
         <FrameLayout
             android:layout_width="60dp"
@@ -758,18 +775,18 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/llo_mode"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.07999998">
+        app:layout_constraintTop_toTopOf="parent">
         <TextView
             android:id="@+id/tv_blu_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/string_blu_dis"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="8pt" />
         <Button
             android:id="@+id/btn_blu"
             android:layout_width="50dp"
@@ -798,19 +815,19 @@
 
     <ImageView
         android:id="@+id/img_battery"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
+        android:layout_width="80dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="9dp"
         android:src="@drawable/im_dianliang100"
-        app:layout_constraintBottom_toTopOf="@+id/llo_time_text"
-        app:layout_constraintHorizontal_bias="0.91"
+        app:layout_constraintBottom_toTopOf="@+id/llo_mode"
+        app:layout_constraintHorizontal_bias="0.915"
         app:layout_constraintLeft_toRightOf="@+id/progressBar"
         app:layout_constraintRight_toLeftOf="@+id/linearLayout"
-        app:layout_constraintTop_toBottomOf="@+id/llo_mode"
-        app:layout_constraintVertical_bias="0.110000014" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.44" />
 
 
     <!--<Button-->
