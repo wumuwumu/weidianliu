@@ -29,4 +29,6 @@
     <string name="about">about</string>
     <string name="str_no_find_bledevice">Not look for Bluetooth device</string>
     <string name="str_device">devicename：</string>
+    <string name="versionNum">version:</string>
+    <string name="blueName">bluetooth name:</string>
 </resources>

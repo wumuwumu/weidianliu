@@ -38,4 +38,7 @@
     <string name="str_language">语言</string>
     <string name="about">关于</string>
     <string name="str_device">设备：</string>
+
+    <string name="versionNum">版本:</string>
+    <string name="blueName">蓝牙名称:</string>
 </resources>

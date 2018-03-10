@@ -25,6 +25,7 @@ public class DeviceListAdapter extends BaseAdapter {
     Context context;
     List<BluetoothDevice> devices;
     String lockName;
+    List<String> nameList;
 
     public DeviceListAdapter(Context context, List<BluetoothDevice> devices, String lockname) {
         this.context = context;
@@ -56,8 +57,11 @@ public class DeviceListAdapter extends BaseAdapter {
         TextView deivceName = (TextView) view.findViewById(R.id.tv_device_name);
         TextView tvconnected = (TextView) view.findViewById(R.id.tv_connected);
 //        RadioButton radioButton =(RadioButton)view.findViewById(R.id.rb_connected);
-        deivceName.setText(devices.get(position).getName());
-        if (devices.get(position).getName().equals(lockName)) {
+        BluetoothDevice bluetoothDevice = devices.get(position);
+        String name = bluetoothDevice.getName();
+        deivceName.setText(name);
+
+        if (lockName.equals(name)) {
             tvconnected.setVisibility(View.VISIBLE);
 //            radioButton.setChecked(true);
         }

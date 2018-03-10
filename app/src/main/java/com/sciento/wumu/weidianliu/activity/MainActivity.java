@@ -22,11 +22,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -51,34 +51,27 @@ import com.sciento.wumu.weidianliu.R;
 import com.sciento.wumu.weidianliu.adapter.DeviceListAdapter;
 import com.sciento.wumu.weidianliu.utils.ProgressDialogUtils;
 import com.sciento.wumu.weidianliu.utils.RequestPermissonUtil;
-import com.sciento.wumu.weidianliu.view.CircleProgressView;
 import com.sciento.wumu.weidianliu.view.LongClickButton;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pl.droidsonroids.gif.GifImageView;
 
-public class MainActivity extends AppCompatActivity implements CompoundButton.OnClickListener, LongClickButton.LongClickRepeatListener,
+public class MainActivity extends BaseActivity implements CompoundButton.OnClickListener, LongClickButton.LongClickRepeatListener,
         View.OnTouchListener, View.OnLongClickListener {
 
 
     private static final String TAG = "MainActivity";
-    //uuid
-    private static final UUID ZZR_UUID_BLE_SERVICE = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb");
-    private static final UUID ZZR_UUID_BLE_CHAR = UUID.fromString("0000FFF1-0000-1000-8000-00805f9b34fb");
-    private static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF4-0000-1000-8000-00805f9b34fb");
-    //蓝牙连接
-    public static BleManager bleManager;
+
+
     //animator
     final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
 
@@ -301,12 +294,20 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     @BindView(R.id.btn_about)
     Button btnAbout;
     //    private String lockName = "BlakBat";
-    private String lockName = "";
-    private BluetoothAdapter mBluetoothAdapter;
+    private String lockName = "BlakBat";
     private boolean isConnected = false;
     private Handler HandlerBlu;
+    //在其他线程处理处理数据
+    Thread thread = new Thread() {
 
+        @Override
+        public void run() {
+            Looper.prepare();
+            HandlerBlu = new MyHandler();
+            Looper.loop();
 
+        }
+    };
     //主线程进行数据的处理
     private Handler HandlerBluMain = new Handler() {
 
@@ -333,54 +334,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             super.handleMessage(msg);
-        }
-    };
-
-    //在其他线程处理处理数据
-    Thread thread = new Thread() {
-
-        @Override
-        public void run() {
-            Looper.prepare();
-            HandlerBlu = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    switch (msg.what) {
-                        case MSG_GET_DATE:
-                            break;
-                        case MSG_QUEUE_DATE:
-                            Bundle queueyBundle = msg.getData();
-                            byte[] queuebyte = queueyBundle.getByteArray("datearray");
-                            for (int i = 0; i < queuebyte.length; i++) {
-                                BleQueue.offer(queuebyte[i]);
-                            }
-                            //Toast.makeText(MainActivity.this,"收到数据："+Arrays.toString(queuebyte),Toast.LENGTH_SHORT).show();
-
-                            if (BleQueue.size() >= 13) {
-                                int fe = BleQueue.peek();
-                                while (fe != -2) {
-                                    BleQueue.poll();
-                                    fe = BleQueue.peek();
-                                }
-                                if (BleQueue.size() >= 13) {
-                                    byte[] mgetByte = new byte[13];
-                                    for (int j = 0; j < 13; j++) {
-                                        mgetByte[j] = BleQueue.poll();
-                                    }
-                                    Message message = Message.obtain();
-                                    message.what = MSG_SHOW_DATE;
-                                    Bundle dateBundle = new Bundle();
-                                    dateBundle.putByteArray("datearray", mgetByte);
-                                    message.setData(dateBundle);
-                                    HandlerBluMain.sendMessage(message);
-                                    //analyseData(mgetByte);
-                                }
-
-                            }
-                    }
-                }
-            };
-            Looper.loop();
         }
     };
 
@@ -483,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             tvAlltimeRemain.setText(getString(R.string.str_train_remain_time)
                                     + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[1] + mTimerShow[2])) / 60 + 1)
                                     + "min");
-//                            
+//
                             startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                                     "FE"
                                             + "01"
@@ -539,7 +492,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
     }
 
-
     private void updateBattery(byte mbattery) {
         if (mbattery >= 0 && mbattery <= 100) {
             if (mbattery > 69)
@@ -561,33 +513,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        RequestPermissonUtil.mayRequestLocation(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all);
-        checkBLEFeature();
         ButterKnife.bind(this);
         init();
         initEvent();
         thread.start();
-    }
-
-    //是否支持蓝牙
-    private void checkBLEFeature() {
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-        bleManager = new BleManager(this);
-        bleManager.enableBluetooth();
     }
 
     private void initEvent() {
@@ -1183,7 +1114,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     }
 
-
     @Override
     protected void onDestroy() {
 
@@ -1191,6 +1121,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         animator.cancel();
 
         super.onDestroy();
+        HandlerBlu.removeCallbacksAndMessages(null);
+        HandlerBluMain.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -1420,6 +1352,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
      * 显示蓝牙设备列表
      */
     private void showDeviceList(List<BluetoothDevice> deviceList) {
+//        List<String> nameList = new ArrayList<>();
+//        for(int i =0 ;i<deviceList.size();i++){
+//            nameList.add(i,deviceList.get(i).getName());
+//        }
         DeviceListAdapter deviceListAdapter = new DeviceListAdapter(MainActivity.this, deviceList, lockName);
         lvBledeviceList.setAdapter(deviceListAdapter);
 //        deviceListAdapter.notifyDataSetChanged();
@@ -1515,16 +1451,19 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 startActivity(itenglish);
                 break;
             case R.id.btn_about:
+                final View dialogView = LayoutInflater.from(MainActivity.this)
+                        .inflate(R.layout.item_about, null);
                 Dialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
                         .setTitle(getString(R.string.about))//设置标题
+                        .setView(dialogView)
                         .setMessage("hahahahahah？")//设置提示内容
                         //确定按钮
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        })
+//                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//
+//                            }
+//                        })
                         .create();//创建对话框
                 dialog.show();//显示对话框
                 break;
@@ -1917,6 +1856,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         + "EF"
         );
     }
+
     //发送定时
     private void sendTimer() {
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
@@ -1973,7 +1913,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         );
     }
 
-
     //长按按钮
     @Override
     public void repeatAction(View view) {
@@ -1996,7 +1935,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
         return false;
     }
-
 
     //判断按钮的的状态，发送数据
     void sendInfor(View v) {
@@ -2342,7 +2280,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
     }
 
-
     void hideAllBtn() {
         btnArmPlus.setVisibility(View.INVISIBLE);
         btnArmMinus.setVisibility(View.INVISIBLE);
@@ -2385,6 +2322,43 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         btnTimeTrainMinus.setVisibility(View.INVISIBLE);
         btnTimeTrainAdd.setVisibility(View.INVISIBLE);
+    }
+
+    class MyHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_QUEUE_DATE:
+                    Bundle queueyBundle = msg.getData();
+                    byte[] queuebyte = queueyBundle.getByteArray("datearray");
+                    for (int i = 0; i < queuebyte.length; i++) {
+                        BleQueue.offer(queuebyte[i]);
+                    }
+                    //Toast.makeText(MainActivity.this,"收到数据："+Arrays.toString(queuebyte),Toast.LENGTH_SHORT).show();
+
+                    if (BleQueue.size() >= 13) {
+                        int fe = BleQueue.peek();
+                        while (fe != -2 && !BleQueue.isEmpty()) {
+                            BleQueue.poll();
+                            fe = BleQueue.peek();
+                        }
+                        if (BleQueue.size() >= 13) {
+                            byte[] mgetByte = new byte[13];
+                            for (int j = 0; j < 13; j++) {
+                                mgetByte[j] = BleQueue.poll();
+                            }
+                            Message message = Message.obtain();
+                            message.what = MSG_SHOW_DATE;
+                            Bundle dateBundle = new Bundle();
+                            dateBundle.putByteArray("datearray", mgetByte);
+                            message.setData(dateBundle);
+                            HandlerBluMain.sendMessage(message);
+                            //analyseData(mgetByte);
+                        }
+
+                    }
+            }
+        }
     }
 
 
