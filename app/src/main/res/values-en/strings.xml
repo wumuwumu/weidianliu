@@ -16,6 +16,8 @@
     <string name="str_find_bledevice">Looking for Bluetooth devices</string>
     <string name="str_language">Language</string>
     <string name="str_train_remain_time">Movement residual time:</string>
+
+    <string name="str_rest_remain_time">Rest residual time:</string>
     <string name="string_alltime">All time(min):</string>
     <string name="string_blu_dis">Disconnected</string>
     <string name="string_blu_en">Connected</string>

@@ -67,10 +67,7 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends BaseActivity implements CompoundButton.OnClickListener, LongClickButton.LongClickRepeatListener,
         View.OnTouchListener, View.OnLongClickListener {
-
-
     private static final String TAG = "MainActivity";
-
 
     //animator
     final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
@@ -98,6 +95,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     private final int MSG_QUEUE_DATE = 2;
     private final int MSG_SHOW_DATE = 1;
     private final int MSG_UPDATE_DEVICE_NAME = 3;
+    private final int SEND_DELAY = 200;
 
     @BindView(R.id.ll_drawer)
     LinearLayout llDrawer;
@@ -259,6 +257,8 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     Button btnStart;
     @BindView(R.id.img_battery)
     ImageView imgBattery;
+    @BindView(R.id.tv_count_down)
+    TextView tvCountDown;
     //显示值
     int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int mAllRank = 100;
@@ -296,18 +296,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     //    private String lockName = "BlakBat";
     private String lockName = "BlakBat";
     private boolean isConnected = false;
-    private Handler HandlerBlu;
-    //在其他线程处理处理数据
-    Thread thread = new Thread() {
-
-        @Override
-        public void run() {
-            Looper.prepare();
-            HandlerBlu = new MyHandler();
-            Looper.loop();
-
-        }
-    };
     //主线程进行数据的处理
     private Handler HandlerBluMain = new Handler() {
 
@@ -331,12 +319,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                             for (int j = 0; j < 13; j++) {
                                 mgetByte[j] = BleQueue.poll();
                             }
-//                            Message message = Message.obtain();
-//                            message.what = MSG_SHOW_DATE;
-//                            Bundle dateBundle = new Bundle();
-//                            dateBundle.putByteArray("datearray", mgetByte);
-//                            message.setData(dateBundle);
-//                            HandlerBluMain.sendMessage(message);
                             analyseData(mgetByte);
                         }
 
@@ -364,148 +346,15 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     private void analyseData(byte[] mgetByte) {
 
         if (mgetByte[12] == -17) {
-            if (!start_en && mgetByte[6] == 1 && startPressIs == true) {
-                startPressIs = false;
-                task.cancel();
+            if (!start_en && mgetByte[6] == 1) {
+//                startPressIs = false;
                 start_en = true;
                 //sendCurrentSignal();
-                mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
-                mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
-                mstop = 200 - mstart;
-                //animator.end();
-                animator.cancel();
-                alltime = mTimerShow[0] * 60;
-                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + mTimerShow[0] + "min");
-                animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
-                animator.setRepeatCount((int) (mTimerShow[0] * 60.0 / (mTimerShow[1] + mTimerShow[2])));
-                animator.setInterpolator(new LinearInterpolator());
-                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        int integer = (int) animator.getAnimatedValue();
-                        if (integer < mstart) {
-                            progressBar.setProgress((int) (integer * 70.0f / mstart));
-                            tvResttimeRemain.setText(getString(R.string.str_all_remain_time) + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-                            if (integer % mratio == 0) {
-                                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                        "FE"
-                                                + "01"
-                                                + "01"
-                                                + String.format("%02x", mTimerShow[0])
-                                                + String.format("%02x", mTimerShow[1])
-                                                + String.format("%02x", mTimerShow[2])
-                                                + "0" + modeSelect
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "EF"
-                                );
-                            }
-
-                        } else {
-                            progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
-                            tvResttimeRemain.setText("休息剩余时间" + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-                            if (integer % mratio == 0 || integer == mstart) {
-                                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                        "FE"
-                                                + "01"
-                                                + "00"
-                                                + String.format("%02x", mTimerShow[0])
-                                                + String.format("%02x", mTimerShow[1])
-                                                + String.format("%02x", mTimerShow[2])
-                                                + "0" + modeSelect
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "00"
-                                                + "EF"
-                                );
-                            }
-                        }
-
-
-                        // progressBar.setProgress(integer);
-                    }
-                });
-
-                animator.addListener(new Animator.AnimatorListener() {
-                    int i = 0;
-
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                        tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
-                        start_en = false;
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-                        i++;
-                        tvAlltimeRemain.setText(getString(R.string.str_train_remain_time)
-                                + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[1] + mTimerShow[2])) / 60 + 1)
-                                + "min");
-//
-                        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                "FE"
-                                        + "01"
-                                        + "01"
-                                        + String.format("%02x", mTimerShow[0])
-                                        + String.format("%02x", mTimerShow[1])
-                                        + String.format("%02x", mTimerShow[2])
-                                        + "0" + modeSelect
-                                        + "00"
-                                        + "00"
-                                        + "00"
-                                        + "00"
-                                        + "00"
-                                        + "EF"
-                        );
-
-                    }
-                });
-                animator.start();
-                mIntervelTime = 0;
-
-                btnStart.setBackgroundResource(R.drawable.btn_start_en);
 
 
             } else if (start_en && mgetByte[6] == 2) {
                 //停止发送
-                startPressIs = false;
-                animator.cancel();
-                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                        "FE"
-                                + "01"
-                                + "00"
-                                + String.format("%02x", mTimerShow[0])
-                                + String.format("%02x", mTimerShow[1])
-                                + String.format("%02x", mTimerShow[2])
-                                + "0" + modeSelect
-                                + "00"
-                                + "00"
-                                + "00"
-                                + "00"
-                                + "00"
-                                + "EF"
-                );
-                //sendTimer();
-                btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                start_en = false;
-                task.cancel();
+//
             }
 
             //更新电量
@@ -540,7 +389,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         ButterKnife.bind(this);
         init();
         initEvent();
-        thread.start();
+//        thread.start();
     }
 
     private void initEvent() {
@@ -1137,10 +986,8 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
         bleManager.closeBluetoothGatt();
         animator.cancel();
-
-        super.onDestroy();
-        HandlerBlu.removeCallbacksAndMessages(null);
         HandlerBluMain.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 
     @Override
@@ -1265,7 +1112,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                         byte[] m_byte = characteristic.getValue();
 
                         Message message = Message.obtain();
-                        message.what = MSG_QUEUE_DATE;
+                        message.what = MSG_SHOW_DATE;
                         Bundle dateBundle = new Bundle();
                         dateBundle.putByteArray("datearray", m_byte);
                         message.setData(dateBundle);
@@ -1371,6 +1218,89 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
     }
 
+    //动画开始
+    private void startAnimal() {
+        mratio = (int) (200 * 2f / (mTimerShow[1] + mTimerShow[2]));
+        mstart = (int) (200.0f * mTimerShow[1] / (mTimerShow[1] + mTimerShow[2]));
+        mstop = 200 - mstart;
+        //animator.end();
+        animator.cancel();
+        alltime = mTimerShow[0] * 60;
+        tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + mTimerShow[0] + "min");
+        animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
+        animator.setRepeatCount((int) (mTimerShow[0] * 60.0 / (mTimerShow[1] + mTimerShow[2])));
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int integer = (int) animator.getAnimatedValue();
+                if (integer < mstart) {
+                    progressBar.setProgress((int) (integer * 70.0f / mstart));
+                    tvResttimeRemain.setText(getString(R.string.str_train_remain_time) + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                    if (integer % mratio == 0) {
+                        sendOpen();
+                    }
+
+                } else {
+                    progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
+                    tvResttimeRemain.setText(getString(R.string.str_rest_remain_time) + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                    if (integer % mratio == 0 || integer == mstart) {
+                        sendClose();
+                    }
+                }
+            }
+        });
+
+        animator.addListener(new Animator.AnimatorListener() {
+            int i = 0;
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
+                tvCountDown.setVisibility(View.INVISIBLE);
+                start_en = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
+                tvCountDown.setVisibility(View.INVISIBLE);
+                sendCloseTimer();
+                start_en = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+                i++;
+                tvAlltimeRemain.setText(getString(R.string.str_train_remain_time)
+                        + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[1] + mTimerShow[2])) / 60 + 1)
+                        + "min");
+                sendOpen();
+
+            }
+        });
+        animator.start();
+        mIntervelTime = 0;
+
+        btnStart.setBackgroundResource(R.drawable.btn_start_en);
+
+    }
+
+
+    private void stopAnimal() {
+        animator.cancel();
+        start_en = false;
+    }
+
+
     //按钮的点击事件
     @OnClick({R.id.btn_blu,
             R.id.btn_start,
@@ -1465,7 +1395,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 Dialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
                         .setTitle(getString(R.string.about))//设置标题
                         .setView(dialogView)
-                        .setMessage("hahahahahah？")//设置提示内容
+                        .setMessage("？")//设置提示内容
                         //确定按钮
 //                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
 //                            @Override
@@ -1481,110 +1411,66 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                     break;
                 }
 
-                sendCurrentSignal();
-                if (!start_en) {
-                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                            "FE"
-                                    + "01"
-                                    + "01"
-                                    + String.format("%02x", mTimerShow[0])
-                                    + String.format("%02x", mTimerShow[1])
-                                    + String.format("%02x", mTimerShow[2])
-                                    + "0" + modeSelect
-                                    + "01"
-                                    + "00"
-                                    + "00"
-                                    + "00"
-                                    + "00"
-                                    + "EF"
-                    );
-
-
-                } else {
-                    startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                            "FE"
-                                    + "01"
-                                    + "00"
-                                    + String.format("%02x", mTimerShow[0])
-                                    + String.format("%02x", mTimerShow[1])
-                                    + String.format("%02x", mTimerShow[2])
-                                    + "0" + modeSelect
-                                    + "02"
-                                    + "00"
-                                    + "00"
-                                    + "00"
-                                    + "00"
-                                    + "EF"
-                    );
-                    //先取消动画
-                    animator.cancel();
-                    btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                    start_en = false;
-
+                if (isConnected == false) {
+                    return;
                 }
 
-                mIntervelTime = System.currentTimeMillis();
-                task.cancel();
-//                重复发送，等待回复
-                task.setRepeatCount(5);
-                task.setDuration(1000);
-                task.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
 
-                    }
+                if (!start_en) {
+                    sendCurrentSignal();
+                    tvCountDown.setText("3S");
+                    tvCountDown.setVisibility(View.VISIBLE);
+                    task.setRepeatCount(3);
+                    task.setDuration(1000);
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
+                    task.addListener(new Animator.AnimatorListener() {
+                        int count = 3;
 
-                    }
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            count = 3;
+                        }
 
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            sendDouOpen();
+                            startAnimal();
+                            start_en = true;
+                        }
 
-                    }
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                        }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                            count--;
+                            if (count < 0) {
+                                tvCountDown.setVisibility(View.INVISIBLE);
+                            }
+                            tvCountDown.setText(count + "S");
+
 //                        if(mbytecopy[6] ==0)
 //                        {
-                        if (!start_en) {
-                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                    "FE"
-                                            + "01"
-                                            + "01"
-                                            + String.format("%02x", mTimerShow[0])
-                                            + String.format("%02x", mTimerShow[1])
-                                            + String.format("%02x", mTimerShow[2])
-                                            + "0" + modeSelect
-                                            + "01"
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "EF"
-                            );
-                        } else {
-                            startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
-                                    "FE"
-                                            + "01"
-                                            + "00"
-                                            + String.format("%02x", mTimerShow[0])
-                                            + String.format("%02x", mTimerShow[1])
-                                            + String.format("%02x", mTimerShow[2])
-                                            + "0" + modeSelect
-                                            + "02"
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "00"
-                                            + "EF"
-                            );
+
                         }
-                    }
-                });
-                startPressIs = true;
-                task.start();
+                    });
+                    task.start();
+
+                } else {
+                    stopAnimal();
+//                    sendCloseTimer();
+
+//                    task.cancel();
+//                    sendDouClose();
+
+                    tvCountDown.setVisibility(View.INVISIBLE);
+                    start_en = false;
+                }
+////                重复发送，等待回复
+
+//                startPressIs = true;
+//                task.start();
                 break;
             case R.id.cirpro_arm:
 
@@ -1601,7 +1487,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 break;
 
             case R.id.cirpro_shoudler:
-
                 if (btnShoulderMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1613,7 +1498,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 }
                 break;
             case R.id.cirpro_chest:
-
                 if (btnChestMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1625,7 +1509,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 }
                 break;
             case R.id.cirpro_abdomen:
-
                 if (btnAbdomenMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1637,7 +1520,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 }
                 break;
             case R.id.cirpro_back:
-
                 if (btnBackMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1649,7 +1531,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 }
                 break;
             case R.id.cirpro_waist:
-
                 if (btnWaistMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1661,7 +1542,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 }
                 break;
             case R.id.cirpro_forethigh:
-
                 if (btnForethighMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1673,7 +1553,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 }
                 break;
             case R.id.cirpro_backthigh:
-
                 if (btnBackthighMinus.getVisibility() != View.VISIBLE) {
                     hideAllBtn();
                     hideGif();
@@ -1776,7 +1655,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 switchAnoxic.setChecked(false);
                 switchMassage.setChecked(false);
                 modeSelect = 1;
-                sendTimer();
+                sendOpenTimer();
                 break;
             case R.id.tv_anoxic:
                 //initSwitch();
@@ -1785,7 +1664,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
                 switchMassage.setChecked(false);
                 modeSelect = 2;
-                sendTimer();
+                sendOpenTimer();
                 break;
             case R.id.tv_massage:
                 //initSwitch();
@@ -1793,7 +1672,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 switchAerobic.setChecked(false);
                 switchAnoxic.setChecked(false);
                 modeSelect = 3;
-                sendTimer();
+                sendOpenTimer();
                 break;
         }
 
@@ -1849,7 +1728,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
             public void run() {
                 sendSignal();
             }
-        }, 100);
+        }, SEND_DELAY);
     }
 
     private void sendSignal() {
@@ -1871,7 +1750,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     }
 
     //发送定时
-    private void sendTimer() {
+    private void sendCloseTimer() {
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "01"
@@ -1907,12 +1786,32 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                                 + "EF"
                 );
             }
-        }, 100);
+        }, SEND_DELAY);
+//        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                "FE"
+//                        + "01"
+////                        + "0" + (mAllRank == 0 ? 0 : 1)
+//                        + "00"
+//                        + String.format("%02x", mTimerShow[0])
+//                        + String.format("%02x", mTimerShow[1])
+//                        + String.format("%02x", mTimerShow[2])
+//                        + "0" + modeSelect
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "EF"
+//        );
+    }
+
+    //发送定时
+    private void sendOpenTimer() {
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "01"
 //                        + "0" + (mAllRank == 0 ? 0 : 1)
-                        + "00"
+                        + "01"
                         + String.format("%02x", mTimerShow[0])
                         + String.format("%02x", mTimerShow[1])
                         + String.format("%02x", mTimerShow[2])
@@ -1924,6 +1823,150 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                         + "00"
                         + "EF"
         );
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                        "FE"
+                                + "01"
+//                        + "0" + (mAllRank == 0 ? 0 : 1)
+                                + "01"
+                                + String.format("%02x", mTimerShow[0])
+                                + String.format("%02x", mTimerShow[1])
+                                + String.format("%02x", mTimerShow[2])
+                                + "0" + modeSelect
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "EF"
+                );
+            }
+        }, SEND_DELAY);
+//        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                "FE"
+//                        + "01"
+////                        + "0" + (mAllRank == 0 ? 0 : 1)
+//                        + "00"
+//                        + String.format("%02x", mTimerShow[0])
+//                        + String.format("%02x", mTimerShow[1])
+//                        + String.format("%02x", mTimerShow[2])
+//                        + "0" + modeSelect
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "EF"
+//        );
+    }
+
+    private void sendTimer() {
+        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                "FE"
+                        + "01"
+                        + "0" + (start_en ? 1 : 0)
+//                        + "01"
+                        + String.format("%02x", mTimerShow[0])
+                        + String.format("%02x", mTimerShow[1])
+                        + String.format("%02x", mTimerShow[2])
+                        + "0" + modeSelect
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "EF"
+        );
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                        "FE"
+                                + "01"
+                                + "0" + (start_en ? 1 : 0)
+                                + String.format("%02x", mTimerShow[0])
+                                + String.format("%02x", mTimerShow[1])
+                                + String.format("%02x", mTimerShow[2])
+                                + "0" + modeSelect
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "00"
+                                + "EF"
+                );
+            }
+        }, SEND_DELAY);
+//        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+//                "FE"
+//                        + "01"
+////                        + "0" + (mAllRank == 0 ? 0 : 1)
+//                        + "00"
+//                        + String.format("%02x", mTimerShow[0])
+//                        + String.format("%02x", mTimerShow[1])
+//                        + String.format("%02x", mTimerShow[2])
+//                        + "0" + modeSelect
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "00"
+//                        + "EF"
+//        );
+    }
+
+    private void sendDouOpen() {
+        sendOpen();
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                sendOpen();
+            }
+        }, SEND_DELAY);
+    }
+
+    private void sendOpen() {
+        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                "FE"
+                        + "01"
+                        + "01"
+                        + String.format("%02x", mTimerShow[0])
+                        + String.format("%02x", mTimerShow[1])
+                        + String.format("%02x", mTimerShow[2])
+                        + "0" + modeSelect
+                        + "01"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "EF"
+        );
+    }
+
+    private void sendClose() {
+        startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
+                "FE"
+                        + "01"
+                        + "00"
+                        + String.format("%02x", mTimerShow[0])
+                        + String.format("%02x", mTimerShow[1])
+                        + String.format("%02x", mTimerShow[2])
+                        + "0" + modeSelect
+                        + "02"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "00"
+                        + "EF"
+        );
+    }
+
+    private void sendDouClose() {
+        sendClose();
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                sendClose();
+            }
+        }, SEND_DELAY);
     }
 
     //长按按钮
@@ -2337,42 +2380,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         btnTimeTrainAdd.setVisibility(View.INVISIBLE);
     }
 
-    class MyHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_QUEUE_DATE:
-                    Bundle queueyBundle = msg.getData();
-                    byte[] queuebyte = queueyBundle.getByteArray("datearray");
-                    for (int i = 0; i < queuebyte.length; i++) {
-                        BleQueue.offer(queuebyte[i]);
-                    }
-                    //Toast.makeText(MainActivity.this,"收到数据："+Arrays.toString(queuebyte),Toast.LENGTH_SHORT).show();
-
-                    if (BleQueue.size() >= 13) {
-                        int fe = BleQueue.peek();
-                        while (fe != -2 && !BleQueue.isEmpty()) {
-                            BleQueue.poll();
-                            fe = BleQueue.peek();
-                        }
-                        if (BleQueue.size() >= 13) {
-                            byte[] mgetByte = new byte[13];
-                            for (int j = 0; j < 13; j++) {
-                                mgetByte[j] = BleQueue.poll();
-                            }
-                            Message message = Message.obtain();
-                            message.what = MSG_SHOW_DATE;
-                            Bundle dateBundle = new Bundle();
-                            dateBundle.putByteArray("datearray", mgetByte);
-                            message.setData(dateBundle);
-                            HandlerBluMain.sendMessage(message);
-                            //analyseData(mgetByte);
-                        }
-
-                    }
-            }
-        }
-    }
 
 
 }

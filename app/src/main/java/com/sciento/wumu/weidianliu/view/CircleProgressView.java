@@ -15,22 +15,14 @@ import android.view.View;
 
 public class CircleProgressView extends View {
     private static final String TAG = "CircleProgressBar";
-
-    private int mMaxProgress = 100;
-
-    private int mProgress = 30;
-
     private final int mCircleLineStrokeWidth = 50;
-
     private final int mTxtStrokeWidth = 2;
-
     // 画圆所在的距形区域
     private final RectF mRectF;
-
     private final Paint mPaint;
-
     private final Context mContext;
-
+    private int mMaxProgress = 100;
+    private int mProgress = 30;
     private String mTxtHint1;
 
     private String mTxtHint2;
@@ -75,7 +67,7 @@ public class CircleProgressView extends View {
         // 绘制进度文案显示
         mPaint.setStrokeWidth(mTxtStrokeWidth);
         String text = mProgress + "%";
-        int textHeight = height / 4;
+        int textHeight = height / 2;
         mPaint.setTextSize(textHeight);
         int textWidth = (int) mPaint.measureText(text, 0, text.length());
         mPaint.setStyle(Paint.Style.FILL);
@@ -84,7 +76,7 @@ public class CircleProgressView extends View {
         if (!TextUtils.isEmpty(mTxtHint1)) {
             mPaint.setStrokeWidth(mTxtStrokeWidth);
             text = mTxtHint1;
-            textHeight = height / 8;
+            textHeight = height / 4;
             mPaint.setTextSize(textHeight);
             mPaint.setColor(Color.rgb(0x99, 0x99, 0x99));
             textWidth = (int) mPaint.measureText(text, 0, text.length());
@@ -95,7 +87,7 @@ public class CircleProgressView extends View {
         if (!TextUtils.isEmpty(mTxtHint2)) {
             mPaint.setStrokeWidth(mTxtStrokeWidth);
             text = mTxtHint2;
-            textHeight = height / 8;
+            textHeight = height / 4;
             mPaint.setTextSize(textHeight);
             textWidth = (int) mPaint.measureText(text, 0, text.length());
             mPaint.setStyle(Paint.Style.FILL);

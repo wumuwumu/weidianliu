@@ -7,6 +7,7 @@
 
     <string name="str_all_remain_time">总时间剩余:</string>
     <string name="str_train_remain_time">运动剩余时间：</string>
+    <string name="str_rest_remain_time">休息剩余时间：</string>
 
     <string name="arm">胳膊</string>
     <string name="shoudler">肩膀</string>
