@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">微电流</string>
+    <string name="app_name">VF-BODY</string>
 
     <string name="string_alltime">总时间(min):</string>
     <string name="string_train_time">运动时间(s):</string>

@@ -68,10 +68,10 @@ import pl.droidsonroids.gif.GifImageView;
 public class MainActivity extends BaseActivity implements CompoundButton.OnClickListener, LongClickButton.LongClickRepeatListener,
         View.OnTouchListener, View.OnLongClickListener {
     private static final String TAG = "MainActivity";
-
+    //蓝牙连接
+    protected static BleManager bleManager;
     //animator
     final ValueAnimator animator = ValueAnimator.ofInt(0, 200);
-
     //隐藏动画
     final ValueAnimator[] animator_hide = {
             ValueAnimator.ofInt(0, 20),
@@ -91,12 +91,12 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
     };
     final ValueAnimator task = ValueAnimator.ofInt(0, 200);
-    private final int MSG_GET_DATE = 0;
+    private final int MSG_UPDATE_PRO = 0;
     private final int MSG_QUEUE_DATE = 2;
     private final int MSG_SHOW_DATE = 1;
     private final int MSG_UPDATE_DEVICE_NAME = 3;
     private final int SEND_DELAY = 200;
-
+    protected BluetoothAdapter mBluetoothAdapter;
     @BindView(R.id.ll_drawer)
     LinearLayout llDrawer;
     @BindView(R.id.dl_all)
@@ -259,43 +259,47 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     ImageView imgBattery;
     @BindView(R.id.tv_count_down)
     TextView tvCountDown;
-    //显示值
-    int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int mAllRank = 100;
-    //timer
-    int[] mTimerShow = {1, 0, 0};
-
-    List<BluetoothDevice> deviceList = new ArrayList<>();
-    BluetoothDevice connectDevice;
-
-    Queue<Byte> BleQueue = new LinkedList<Byte>();
-    //mode
-    int modeSelect = 1;
-
-    //all switch
-    boolean start_en = false;
-    boolean startPressIs = false;
-
-    int mallRankCopy = 0;
-    int mstart = 0;
-    int mstop = 0;
-    int mratio = 0;
-    int alltime = 0;
-    //get back
-    long mIntervelTime = 0;
     @BindView(R.id.btn_find_bledevice)
     Button btnFindBledevice;
     @BindView(R.id.linearLayout)
     LinearLayout linearLayout;
     @BindView(R.id.lv_bledevice_list)
     ListView lvBledeviceList;
-    byte[] mbytecopy = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    List<CircleProgressBar> circleProgressBarList = new ArrayList<>();
     @BindView(R.id.btn_about)
     Button btnAbout;
+    List<BluetoothDevice> deviceList = new ArrayList<>();
+    BluetoothDevice connectDevice;
+    //显示值
+    int[] mEveryRank = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int mAllRank = 100;
+    //timer
+    int[] mTimerShow = {1, 0, 0};
+
+
+    Queue<Byte> BleQueue = new LinkedList<Byte>();
+
+    //mode
+    int modeSelect = 1;
+
+    //all switch
+    boolean start_en = false;
+    boolean startPressIs = false;
+    boolean isStart = false;
+
+    int mallRankCopy = 0;
+    int mstart = 0;
+    int mstop = 0;
+    int mratio = 0;
+    int alltime = 0;
+
+    byte[] mbytecopy = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    List<CircleProgressBar> circleProgressBarList = new ArrayList<>();
     //    private String lockName = "BlakBat";
     private String lockName = "BlakBat";
+
     private boolean isConnected = false;
+
+
     //主线程进行数据的处理
     private Handler HandlerBluMain = new Handler() {
 
@@ -305,36 +309,45 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 case MSG_SHOW_DATE:
                     Bundle queueyBundle = msg.getData();
                     byte[] queuebyte = queueyBundle.getByteArray("datearray");
+                    if (queuebyte == null || queuebyte.length == 0) {
+                        break;
+                    }
                     for (int i = 0; i < queuebyte.length; i++) {
                         BleQueue.offer(queuebyte[i]);
                     }
-                    if (BleQueue.size() >= 13) {
-                        int fe = BleQueue.peek();
-                        while (fe != -2 && !BleQueue.isEmpty()) {
-                            BleQueue.poll();
-                            fe = BleQueue.peek();
-                        }
-                        if (BleQueue.size() >= 13) {
-                            byte[] mgetByte = new byte[13];
-                            for (int j = 0; j < 13; j++) {
-                                mgetByte[j] = BleQueue.poll();
-                            }
-                            analyseData(mgetByte);
-                        }
-
+                    if (BleQueue.size() > 13) {
+                        BleQueue.clear();
                     }
-//                    analyseData(queuebyte);
+                    if (BleQueue.size() == 13) {
+                        byte[] mgetByte = new byte[13];
+                        for (int j = 0; j < 13; j++) {
+                            mgetByte[j] = BleQueue.poll();
+                        }
+                        analyseData(mgetByte);
+                    }
+
+//                    if (BleQueue.size() >= 13) {
+//                        int fe = BleQueue.peek();
+//                        while (fe != -2 && BleQueue.size()>2) {
+//                            BleQueue.poll();
+//                            Log.d(TAG,BleQueue.size()+"大小");
+//                            fe = BleQueue.peek();
+//                        }
+//                        if (BleQueue.size() >= 13) {
+//                            byte[] mgetByte = new byte[13];
+//                            for (int j = 0; j < 13; j++) {
+//                                mgetByte[j] = BleQueue.poll();
+//                            }
+//                            analyseData(mgetByte);
+//                        }
+//
+//                    }
                     break;
                 //保存蓝牙连接的名字
                 case MSG_UPDATE_DEVICE_NAME:
-                    //获取一个文件名为test、权限为private的xml文件的SharedPreferences对象
                     SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", MODE_PRIVATE);
-
-                    //得到SharedPreferences.Editor对象，并保存数据到该对象中
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("devicename", lockName);
-
-                    //保存key-value对到文件中
                     editor.commit();
                     break;
             }
@@ -385,11 +398,44 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkBLEFeature();
         setContentView(R.layout.activity_all);
         ButterKnife.bind(this);
+
         init();
         initEvent();
 //        thread.start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", Context.MODE_PRIVATE);
+        String language = sharedPreferences.getString("language", "zh_simple");
+        switchLanguage(language);
+        bleManager.enableBluetooth();
+        if (isConnected) {
+            btnBlu.setBackgroundResource(R.drawable.btn_blu_press);
+            tvBluText.setText(R.string.string_blu_en);
+        } else {
+            tvBluText.setText(R.string.string_blu_dis);
+            btnBlu.setBackgroundResource(R.drawable.btn_blu_nor);
+        }
+        //thread.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+
+        super.onDestroy();
+        animator.removeAllUpdateListeners();
+        animator.cancel();
+        bleManager.closeBluetoothGatt();
+
+        BleQueue.clear();
+        HandlerBluMain.removeCallbacksAndMessages(null);
+
     }
 
     private void initEvent() {
@@ -851,6 +897,68 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
             }
         });
 
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int integer = (int) animator.getAnimatedValue();
+                if (integer % 2 == 0 || integer == mstart) {
+                    if (integer < mstart) {
+                        progressBar.setProgress((int) (integer * 70.0f / mstart));
+                        tvResttimeRemain.setText(getString(R.string.str_train_remain_time) + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                        if (integer % 40 == 0 || integer == 0) {
+                            sendOpen();
+                            isStart = true;
+                        }
+
+                    } else {
+                        progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
+                        tvResttimeRemain.setText(getString(R.string.str_rest_remain_time) + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
+                        if (integer % 40 == 0 || integer == mstart) {
+                            sendClose();
+                            isStart = false;
+                        }
+                    }
+                }
+            }
+        });
+
+        animator.addListener(new Animator.AnimatorListener() {
+            int i = 0;
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                i = 0;
+                sendDouOpen();
+                isStart = true;
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
+                progressBar.setProgress(0);
+                tvCountDown.setVisibility(View.INVISIBLE);
+                start_en = false;
+                isStart = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+                i++;
+                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time)
+                        + ((int) ((mTimerShow[0] * 60 - i * (mTimerShow[1] + mTimerShow[2])) / 60))
+                        + "min");
+                sendOpen();
+                isStart = true;
+
+            }
+        });
+
 
     }
 
@@ -945,6 +1053,27 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
     }
 
+
+    //是否支持蓝牙
+    protected void checkBLEFeature() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        bleManager = new BleManager(this);
+        bleManager.enableBluetooth();
+    }
+
+
     /**
      * 切换语言
      *
@@ -981,31 +1110,9 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
     }
 
-    @Override
-    protected void onDestroy() {
 
-        bleManager.closeBluetoothGatt();
-        animator.cancel();
-        HandlerBluMain.removeCallbacksAndMessages(null);
-        super.onDestroy();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences sharedPreferences = getSharedPreferences("weidianliu", Context.MODE_PRIVATE);
-        String language = sharedPreferences.getString("language", "zh_simple");
-        switchLanguage(language);
-        bleManager.enableBluetooth();
-        if (isConnected) {
-            btnBlu.setBackgroundResource(R.drawable.btn_blu_press);
-            tvBluText.setText(R.string.string_blu_en);
-        } else {
-            tvBluText.setText(R.string.string_blu_dis);
-            btnBlu.setBackgroundResource(R.drawable.btn_blu_nor);
-        }
-        //thread.start();
-    }
+
 
     private void connectNameDevice(final String deviceName) {
 
@@ -1108,9 +1215,11 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 new BleCharacterCallback() {
                     @Override
                     public void onSuccess(final BluetoothGattCharacteristic characteristic) {
-                        Log.d(TAG, "notify success： " + '\n' + String.valueOf(HexUtil.encodeHex(characteristic.getValue())));
+//                        Log.d(TAG, "notify success： " + '\n' + String.valueOf(HexUtil.encodeHex(characteristic.getValue())));
                         byte[] m_byte = characteristic.getValue();
-
+                        if (m_byte == null) {
+                            return;
+                        }
                         Message message = Message.obtain();
                         message.what = MSG_SHOW_DATE;
                         Bundle dateBundle = new Bundle();
@@ -1228,67 +1337,10 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         alltime = mTimerShow[0] * 60;
         tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + mTimerShow[0] + "min");
         animator.setDuration((mTimerShow[1] + mTimerShow[2]) * 1000);
-        animator.setRepeatCount((int) (mTimerShow[0] * 60.0 / (mTimerShow[1] + mTimerShow[2])));
+        animator.setRepeatCount((int) ((mTimerShow[0]) * 60 / (mTimerShow[1] + mTimerShow[2])) - 1);
         animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int integer = (int) animator.getAnimatedValue();
-                if (integer < mstart) {
-                    progressBar.setProgress((int) (integer * 70.0f / mstart));
-                    tvResttimeRemain.setText(getString(R.string.str_train_remain_time) + (mTimerShow[1] - (int) (integer / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-                    if (integer % mratio == 0) {
-                        sendOpen();
-                    }
 
-                } else {
-                    progressBar.setProgress((int) ((200 - integer) * 70.0f / mstop));
-                    tvResttimeRemain.setText(getString(R.string.str_rest_remain_time) + ((int) ((200 - integer) / 200f * (mTimerShow[1] + mTimerShow[2]))) + "s");
-                    if (integer % mratio == 0 || integer == mstart) {
-                        sendClose();
-                    }
-                }
-            }
-        });
-
-        animator.addListener(new Animator.AnimatorListener() {
-            int i = 0;
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
-                tvCountDown.setVisibility(View.INVISIBLE);
-                start_en = false;
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                btnStart.setBackgroundResource(R.drawable.btn_start_dis);
-                tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
-                tvCountDown.setVisibility(View.INVISIBLE);
-                sendCloseTimer();
-                start_en = false;
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-                i++;
-                tvAlltimeRemain.setText(getString(R.string.str_train_remain_time)
-                        + ((int) (mTimerShow[0] * 60f - i * (mTimerShow[1] + mTimerShow[2])) / 60 + 1)
-                        + "min");
-                sendOpen();
-
-            }
-        });
         animator.start();
-        mIntervelTime = 0;
 
         btnStart.setBackgroundResource(R.drawable.btn_start_en);
 
@@ -1296,6 +1348,11 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
 
     private void stopAnimal() {
+        btnStart.setBackgroundResource(R.drawable.btn_start_dis);
+        tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
+        tvCountDown.setVisibility(View.INVISIBLE);
+        sendDouClose();
+//        animator.removeAllUpdateListeners();
         animator.cancel();
         start_en = false;
     }
@@ -1415,12 +1472,14 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                     return;
                 }
 
-
-                if (!start_en) {
+                if (!start_en && !startPressIs) {
+                    startPressIs = true;
+                    task.removeAllUpdateListeners();
+                    task.cancel();
                     sendCurrentSignal();
                     tvCountDown.setText("3S");
                     tvCountDown.setVisibility(View.VISIBLE);
-                    task.setRepeatCount(3);
+                    task.setRepeatCount(2);
                     task.setDuration(1000);
 
                     task.addListener(new Animator.AnimatorListener() {
@@ -1433,13 +1492,16 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            sendDouOpen();
+                            startPressIs = false;
                             startAnimal();
+                            tvCountDown.setVisibility(View.INVISIBLE);
                             start_en = true;
+                            isStart = true;
                         }
 
                         @Override
                         public void onAnimationCancel(Animator animation) {
+                            startPressIs = false;
                         }
 
                         @Override
@@ -1450,27 +1512,15 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                             }
                             tvCountDown.setText(count + "S");
 
-//                        if(mbytecopy[6] ==0)
-//                        {
 
                         }
                     });
                     task.start();
 
-                } else {
+                } else if (start_en = true) {
                     stopAnimal();
-//                    sendCloseTimer();
-
-//                    task.cancel();
-//                    sendDouClose();
-
-                    tvCountDown.setVisibility(View.INVISIBLE);
                     start_en = false;
                 }
-////                重复发送，等待回复
-
-//                startPressIs = true;
-//                task.start();
                 break;
             case R.id.cirpro_arm:
 
@@ -1810,8 +1860,8 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "01"
-//                        + "0" + (mAllRank == 0 ? 0 : 1)
-                        + "01"
+                        + "0" + (isStart ? 1 : 0)
+//                        + "01"
                         + String.format("%02x", mTimerShow[0])
                         + String.format("%02x", mTimerShow[1])
                         + String.format("%02x", mTimerShow[2])
@@ -1828,8 +1878,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                         "FE"
                                 + "01"
-//                        + "0" + (mAllRank == 0 ? 0 : 1)
-                                + "01"
+                                + "0" + (isStart ? 1 : 0)
                                 + String.format("%02x", mTimerShow[0])
                                 + String.format("%02x", mTimerShow[1])
                                 + String.format("%02x", mTimerShow[2])
@@ -2379,7 +2428,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         btnTimeTrainMinus.setVisibility(View.INVISIBLE);
         btnTimeTrainAdd.setVisibility(View.INVISIBLE);
     }
-
 
 
 }

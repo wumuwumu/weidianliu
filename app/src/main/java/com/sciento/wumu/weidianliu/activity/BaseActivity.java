@@ -34,38 +34,16 @@ public class BaseActivity extends AppCompatActivity {
     protected static final UUID ZZR_UUID_BLE_CHAR = UUID.fromString("0000FFF1-0000-1000-8000-00805f9b34fb");
     protected static final UUID ZZR_UUID_BLE_CHAR1 = UUID.fromString("0000FFF4-0000-1000-8000-00805f9b34fb");
 
-    //蓝牙连接
-    protected static BleManager bleManager;
-    protected BluetoothAdapter mBluetoothAdapter;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         RequestPermissonUtil.mayRequestLocation(this);
         super.onCreate(savedInstanceState);
-        checkBLEFeature();
 
     }
 
 
-    //是否支持蓝牙
-    protected void checkBLEFeature() {
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
 
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-        bleManager = new BleManager(this);
-        bleManager.enableBluetooth();
-    }
 
 
 }

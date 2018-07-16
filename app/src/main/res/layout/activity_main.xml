@@ -102,7 +102,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.75">
+        app:layout_constraintVertical_bias="0.8">
 
         <!--left  arm-->
         <LinearLayout
@@ -261,7 +261,8 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/abdomen"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="12pt" />
 
         <!--back left-->
         <LinearLayout
@@ -317,7 +318,7 @@
         app:layout_constraintLeft_toRightOf="@+id/all_left"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.75">
+        app:layout_constraintVertical_bias="0.8">
 
         <!--waist right-->
         <LinearLayout
@@ -850,7 +851,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="9dp"
-        android:src="@drawable/im_dianliang100"
+        android:src="@drawable/im_dianliang10"
         app:layout_constraintBottom_toTopOf="@+id/llo_mode"
         app:layout_constraintHorizontal_bias="0.915"
         app:layout_constraintLeft_toRightOf="@+id/progressBar"
