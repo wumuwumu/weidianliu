@@ -1,5 +1,10 @@
 <resources>
-    <string name="app_name">VF-BODY</string>
+    <string name="app_name">苏格健身</string>
+
+    <string name="start">启动</string>
+    <string name="pause">暂停</string>
+    <string name="pausing">暂停中</string>
+
 
     <string name="string_alltime">总时间(min):</string>
     <string name="string_train_time">运动时间(s):</string>

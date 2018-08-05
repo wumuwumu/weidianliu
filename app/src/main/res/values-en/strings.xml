@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="start">start</string>
+    <string name="pause">pause</string>
+    <string name="pausing">pausing</string>
+
     <string name="Back_of_the_thigh">back of the thigh</string>
     <string name="Thigh_front_side">thigh front side</string>
     <string name="abdomen">abdomen</string>

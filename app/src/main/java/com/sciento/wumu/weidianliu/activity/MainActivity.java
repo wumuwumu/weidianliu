@@ -10,7 +10,6 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,7 +17,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -50,7 +48,6 @@ import com.dinuscxj.progressbar.CircleProgressBar;
 import com.sciento.wumu.weidianliu.R;
 import com.sciento.wumu.weidianliu.adapter.DeviceListAdapter;
 import com.sciento.wumu.weidianliu.utils.ProgressDialogUtils;
-import com.sciento.wumu.weidianliu.utils.RequestPermissonUtil;
 import com.sciento.wumu.weidianliu.view.LongClickButton;
 
 import java.util.ArrayList;
@@ -282,10 +279,11 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     int modeSelect = 1;
 
     //all switch
-    boolean start_en = false;
+    boolean startEn = false;
     boolean startPressIs = false;
     boolean isStart = false;
-
+    //动画的状态
+    int animationStatus = 0;
     int mallRankCopy = 0;
     int mstart = 0;
     int mstop = 0;
@@ -294,6 +292,8 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
     byte[] mbytecopy = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     List<CircleProgressBar> circleProgressBarList = new ArrayList<>();
+    @BindView(R.id.btn_pause)
+    Button btnPause;
     //    private String lockName = "BlakBat";
     private String lockName = "BlakBat";
 
@@ -325,23 +325,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                         }
                         analyseData(mgetByte);
                     }
-
-//                    if (BleQueue.size() >= 13) {
-//                        int fe = BleQueue.peek();
-//                        while (fe != -2 && BleQueue.size()>2) {
-//                            BleQueue.poll();
-//                            Log.d(TAG,BleQueue.size()+"大小");
-//                            fe = BleQueue.peek();
-//                        }
-//                        if (BleQueue.size() >= 13) {
-//                            byte[] mgetByte = new byte[13];
-//                            for (int j = 0; j < 13; j++) {
-//                                mgetByte[j] = BleQueue.poll();
-//                            }
-//                            analyseData(mgetByte);
-//                        }
-//
-//                    }
                     break;
                 //保存蓝牙连接的名字
                 case MSG_UPDATE_DEVICE_NAME:
@@ -359,13 +342,10 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
     private void analyseData(byte[] mgetByte) {
 
         if (mgetByte[12] == -17) {
-            if (!start_en && mgetByte[6] == 1) {
-//                startPressIs = false;
-                start_en = true;
-                //sendCurrentSignal();
+            if (!startEn && mgetByte[6] == 1) {
+                startEn = true;
 
-
-            } else if (start_en && mgetByte[6] == 2) {
+            } else if (startEn && mgetByte[6] == 2) {
                 //停止发送
 //
             }
@@ -404,7 +384,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
         init();
         initEvent();
-//        thread.start();
     }
 
     @Override
@@ -421,7 +400,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
             tvBluText.setText(R.string.string_blu_dis);
             btnBlu.setBackgroundResource(R.drawable.btn_blu_nor);
         }
-        //thread.start();
     }
 
     @Override
@@ -869,7 +847,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         lvBledeviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (start_en) {
+                if (startEn) {
                     return;
                 }
                 if (isConnected) {
@@ -939,8 +917,11 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 tvAlltimeRemain.setText(getString(R.string.str_all_remain_time) + "0min");
                 progressBar.setProgress(0);
                 tvCountDown.setVisibility(View.INVISIBLE);
-                start_en = false;
+                startEn = false;
                 isStart = false;
+
+                //状态
+                stopPauseBtn();
             }
 
             @Override
@@ -1109,9 +1090,6 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
 
 
     }
-
-
-
 
 
     private void connectNameDevice(final String deviceName) {
@@ -1341,9 +1319,36 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         animator.setInterpolator(new LinearInterpolator());
 
         animator.start();
-
+        btnPause.setVisibility(View.VISIBLE);
+        animationStatus = 1;
         btnStart.setBackgroundResource(R.drawable.btn_start_en);
 
+    }
+
+
+    // 暂停动画
+    private void pauseAnimal() {
+        if (animator.isRunning()) {
+            animator.pause();
+            animationStatus = 2;
+            btnPause.setText(getString(R.string.pausing));
+        }
+
+    }
+
+    private void resumeAnimal() {
+        if (animator.isPaused()) {
+            animator.resume();
+            btnPause.setText(getString(R.string.pause));
+            animationStatus = 1;
+        }
+
+    }
+
+    private void stopPauseBtn() {
+        animationStatus = 0;
+        btnPause.setVisibility(View.INVISIBLE);
+        btnPause.setText(getString(R.string.pause));
     }
 
 
@@ -1354,13 +1359,14 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         sendDouClose();
 //        animator.removeAllUpdateListeners();
         animator.cancel();
-        start_en = false;
+        startEn = false;
     }
 
 
     //按钮的点击事件
     @OnClick({R.id.btn_blu,
             R.id.btn_start,
+            R.id.btn_pause,
             R.id.cirpro_arm,
             R.id.cirpro_shoudler,
             R.id.cirpro_chest,
@@ -1472,7 +1478,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                     return;
                 }
 
-                if (!start_en && !startPressIs) {
+                if (!startEn && !startPressIs) {
                     startPressIs = true;
                     task.removeAllUpdateListeners();
                     task.cancel();
@@ -1495,7 +1501,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                             startPressIs = false;
                             startAnimal();
                             tvCountDown.setVisibility(View.INVISIBLE);
-                            start_en = true;
+                            startEn = true;
                             isStart = true;
                         }
 
@@ -1517,11 +1523,18 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                     });
                     task.start();
 
-                } else if (start_en = true) {
+                } else if (startEn = true) {
                     stopAnimal();
-                    start_en = false;
+                    stopPauseBtn();
+                    startEn = false;
                 }
                 break;
+            case R.id.btn_pause:
+                if (animationStatus == 1) {
+                    pauseAnimal();
+                } else if (animationStatus == 2) {
+                    resumeAnimal();
+                }
             case R.id.cirpro_arm:
 
                 if (btnArmMinus.getVisibility() != View.VISIBLE) {
@@ -1914,7 +1927,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
         startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                 "FE"
                         + "01"
-                        + "0" + (start_en ? 1 : 0)
+                        + "0" + (startEn ? 1 : 0)
 //                        + "01"
                         + String.format("%02x", mTimerShow[0])
                         + String.format("%02x", mTimerShow[1])
@@ -1932,7 +1945,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 startWrite(ZZR_UUID_BLE_SERVICE.toString(), ZZR_UUID_BLE_CHAR.toString(),
                         "FE"
                                 + "01"
-                                + "0" + (start_en ? 1 : 0)
+                                + "0" + (startEn ? 1 : 0)
                                 + String.format("%02x", mTimerShow[0])
                                 + String.format("%02x", mTimerShow[1])
                                 + String.format("%02x", mTimerShow[2])
@@ -2162,38 +2175,38 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 break;
 
             case R.id.btn_time_all_minus:
-                if (start_en) break;
+                if (startEn) break;
                 // animator_hide[11].cancel();
                 animator_hide[11].start();
                 sendTimer();
 
                 break;
             case R.id.btn_time_all_add:
-                if (start_en) break;
+                if (startEn) break;
                 // animator_hide[11].cancel();
                 animator_hide[11].start();
                 sendTimer();
                 break;
             case R.id.btn_time_train_minus:
-                if (start_en) break;
+                if (startEn) break;
                 // animator_hide[12].cancel();
                 animator_hide[12].start();
                 sendTimer();
                 break;
             case R.id.btn_time_train_add:
-                if (start_en) break;
+                if (startEn) break;
                 // animator_hide[12].cancel();
                 animator_hide[12].start();
                 sendTimer();
                 break;
             case R.id.btn_time_rest_minus:
-                if (start_en) break;
+                if (startEn) break;
                 // animator_hide[13].cancel();
                 animator_hide[13].start();
                 sendTimer();
                 break;
             case R.id.btn_time_rest_add:
-                if (start_en) break;
+                if (startEn) break;
                 //animator_hide[13].cancel();
                 animator_hide[13].start();
                 sendTimer();
@@ -2340,42 +2353,42 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnClick
                 break;
 
             case R.id.btn_time_all_minus:
-                if (start_en) break;
+                if (startEn) break;
                 if (mTimerShow[0] <= 0) break;
                 mTimerShow[0]--;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_all_add:
-                if (start_en) break;
+                if (startEn) break;
                 if (mTimerShow[0] >= 60) break;
                 mTimerShow[0]++;
                 btnControlerShow.setText(mTimerShow[0] + "");
 
                 break;
             case R.id.btn_time_train_minus:
-                if (start_en) break;
+                if (startEn) break;
                 if (mTimerShow[1] <= 0) break;
                 mTimerShow[1]--;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_train_add:
-                if (start_en) break;
+                if (startEn) break;
                 if (mTimerShow[1] >= 60) break;
                 mTimerShow[1]++;
                 btnTrainShow.setText(mTimerShow[1] + "");
 
                 break;
             case R.id.btn_time_rest_minus:
-                if (start_en) break;
+                if (startEn) break;
                 if (mTimerShow[2] <= 0) break;
                 mTimerShow[2]--;
                 btnRestShow.setText(mTimerShow[2] + "");
 
                 break;
             case R.id.btn_time_rest_add:
-                if (start_en) break;
+                if (startEn) break;
                 if (mTimerShow[2] >= 70) break;
                 mTimerShow[2]++;
                 btnRestShow.setText(mTimerShow[2] + "");

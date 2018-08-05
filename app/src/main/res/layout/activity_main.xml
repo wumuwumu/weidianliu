@@ -18,7 +18,7 @@
         android:paddingLeft="20dp"
         android:text="@string/str_all_remain_time"
         android:textColor="@color/white"
-        android:textSize="12pt"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/progressBar"
@@ -36,7 +36,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/str_train_remain_time"
         android:textColor="@color/white"
-        android:textSize="12pt"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintHorizontal_bias="0.89"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -76,7 +76,7 @@
         android:layout_marginTop="8dp"
         android:text="3S"
         android:textColor="@color/white"
-        android:textSize="15pt"
+        android:textSize="15sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.048"
@@ -127,7 +127,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line"
 
                 />
@@ -144,7 +144,7 @@
             android:layout_weight="1"
             android:text="@string/arm"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--left  shoulder-->
         <LinearLayout
@@ -169,7 +169,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -184,7 +184,7 @@
             android:layout_weight="1"
             android:text="@string/shoudler"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--chest-->
         <LinearLayout
@@ -208,7 +208,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -223,7 +223,7 @@
             android:layout_weight="1"
             android:text="@string/chest"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--abdomen left-->
         <LinearLayout
@@ -247,7 +247,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -262,7 +262,7 @@
             android:layout_weight="1"
             android:text="@string/abdomen"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--back left-->
         <LinearLayout
@@ -286,7 +286,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -301,7 +301,7 @@
             android:layout_weight="1"
             android:text="@string/back"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
     </LinearLayout>
 
 
@@ -341,7 +341,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -356,7 +356,7 @@
             android:layout_weight="1"
             android:text="@string/waist"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--forethigh right-->
         <LinearLayout
@@ -379,7 +379,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -394,7 +394,7 @@
             android:layout_weight="1"
             android:text="@string/Thigh_front_side"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--backthigh right-->
         <LinearLayout
@@ -419,7 +419,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -434,7 +434,7 @@
             android:layout_weight="1"
             android:text="@string/Back_of_the_thigh"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--hips right-->
         <LinearLayout
@@ -457,7 +457,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -472,7 +472,7 @@
             android:layout_weight="1"
             android:text="@string/hips"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <!--calf right-->
         <LinearLayout
@@ -495,7 +495,7 @@
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
                 app:progress_text_color="@color/circleprocolor"
-                app:progress_text_size="12pt"
+                app:progress_text_size="15sp"
                 app:style="solid_line" />
 
             <com.sciento.wumu.weidianliu.view.LongClickButton
@@ -510,7 +510,7 @@
             android:layout_weight="1"
             android:text="@string/calf"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
     </LinearLayout>
 
     <!--image -->
@@ -591,7 +591,7 @@
             android:gravity="center"
             android:text="@string/string_alltime"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -600,7 +600,7 @@
             android:gravity="center"
             android:text="@string/string_train_time"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -609,7 +609,7 @@
             android:gravity="center"
             android:text="@string/string_rest_time"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
     </LinearLayout>
 
     <!--time-->
@@ -713,7 +713,7 @@
             android:layout_gravity="center"
             android:text="@string/string_mode_aerobic"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <FrameLayout
             android:layout_width="60dp"
@@ -742,7 +742,7 @@
             android:layout_gravity="center"
             android:text="@string/string_mode_anoxic"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <FrameLayout
             android:layout_width="60dp"
@@ -769,7 +769,7 @@
             android:layout_gravity="center"
             android:text="@string/string_mode_massage"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
 
         <FrameLayout
             android:layout_width="60dp"
@@ -816,7 +816,7 @@
             android:layout_height="wrap_content"
             android:text="@string/string_blu_dis"
             android:textColor="@color/white"
-            android:textSize="12pt" />
+            android:textSize="15sp" />
         <Button
             android:id="@+id/btn_blu"
             android:layout_width="50dp"
@@ -842,6 +842,25 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/llo_time"
         app:layout_constraintVertical_bias="0.459" />
+
+    <Button
+        android:id="@+id/btn_pause"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/btn_start_dis"
+        android:text="@string/pause"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.19"
+        app:layout_constraintLeft_toRightOf="@+id/btn_start"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llo_time"
+        app:layout_constraintVertical_bias="0.445" />
 
     <ImageView
         android:id="@+id/img_battery"
