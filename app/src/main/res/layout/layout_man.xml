@@ -11,14 +11,14 @@
 
         <ImageView
             android:id="@+id/img_head"
-            android:layout_width="200dp"
-            android:layout_height="500dp"
+            android:layout_width="145dp"
+            android:layout_height="350dp"
             android:src="@drawable/human_left" />
 
         <ImageView
             android:id="@+id/img_back"
-            android:layout_width="200dp"
-            android:layout_height="500dp"
+            android:layout_width="145dp"
+            android:layout_height="350dp"
             android:src="@drawable/human_right" />
 
     </LinearLayout>

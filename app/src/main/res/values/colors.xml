@@ -34,7 +34,7 @@
     <!-- A really darker Holo shade of gray -->
     <color name="holo_darker_gray">#ffaaaaaa</color>
 
-    <color name="circleprocolor">#34e5b7</color>
+    <color name="circle_pro_color">#e65a72</color>
 
     <color name="white">#ffffff</color>
 

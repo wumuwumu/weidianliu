@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg"
+    android:padding="8dp"
     tools:context="com.sciento.wumu.weidianliu.activity.MainActivity">
 
     <TextView
@@ -89,20 +90,18 @@
     <LinearLayout
         android:id="@+id/all_left"
         android:layout_width="wrap_content"
-        android:layout_height="550dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="450dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.01"
+        app:layout_constraintHorizontal_bias="0.003"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.8">
+        app:layout_constraintVertical_bias="1.0">
 
         <!--left  arm-->
         <LinearLayout
@@ -121,12 +120,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line"
 
@@ -163,12 +162,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -202,12 +201,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -241,12 +240,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -280,12 +279,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -308,17 +307,18 @@
     <LinearLayout
         android:id="@+id/all_right"
         android:layout_width="wrap_content"
-        android:layout_height="550dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="450dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.434"
         app:layout_constraintLeft_toRightOf="@+id/all_left"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.8">
+        app:layout_constraintVertical_bias="1.0">
 
         <!--waist right-->
         <LinearLayout
@@ -335,12 +335,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -373,12 +373,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -413,12 +413,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -451,12 +451,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -489,12 +489,12 @@
                 app:line_count="30"
                 app:line_width="4dp"
                 app:progress_background_color="@color/holo_darker_gray"
-                app:progress_end_color="@color/circleprocolor"
+                app:progress_end_color="@color/circle_pro_color"
                 app:progress_shader="sweep"
-                app:progress_start_color="@color/circleprocolor"
+                app:progress_start_color="@color/circle_pro_color"
                 app:progress_stroke_cap="round"
                 app:progress_stroke_width="4dp"
-                app:progress_text_color="@color/circleprocolor"
+                app:progress_text_color="@color/circle_pro_color"
                 app:progress_text_size="15sp"
                 app:style="solid_line" />
 
@@ -517,27 +517,24 @@
     <include
         android:id="@+id/include"
         layout="@layout/layout_man"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_width="290dp"
+        android:layout_height="350dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="92dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintLeft_toRightOf="@+id/all_left"
         app:layout_constraintRight_toLeftOf="@+id/all_right"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.14999998" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/llo_all_controller"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="55dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/all_left"
         app:layout_constraintRight_toLeftOf="@+id/all_right"
@@ -545,23 +542,23 @@
 
         <com.sciento.wumu.weidianliu.view.LongClickButton
             android:id="@+id/imgbtn_all_minus"
-            android:layout_width="30dp"
-            android:layout_height="50dp"
+            android:layout_width="25dp"
+            android:layout_height="35dp"
             android:layout_marginRight="20dp"
             android:background="@drawable/footer_subtract" />
 
         <Button
             android:id="@+id/imgbtn_all_show"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@drawable/right_base"
             android:text="0"
             android:textColor="@color/white" />
 
         <com.sciento.wumu.weidianliu.view.LongClickButton
             android:id="@+id/imgbtn_all_add"
-            android:layout_width="30dp"
-            android:layout_height="50dp"
+            android:layout_width="20dp"
+            android:layout_height="35dp"
             android:layout_marginLeft="20dp"
             android:background="@drawable/footer_add" />
 
@@ -571,18 +568,18 @@
     <LinearLayout
         android:id="@+id/llo_time_text"
         android:layout_width="wrap_content"
-        android:layout_height="350dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="300dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.708"
         app:layout_constraintLeft_toRightOf="@+id/all_right"
         app:layout_constraintRight_toLeftOf="@+id/llo_time"
         app:layout_constraintTop_toBottomOf="@+id/llo_mode"
-        app:layout_constraintVertical_bias="0.499">
+        app:layout_constraintVertical_bias="0.3">
 
         <TextView
             android:layout_width="wrap_content"
@@ -616,19 +613,18 @@
     <LinearLayout
         android:id="@+id/llo_time"
         android:layout_width="wrap_content"
-        android:layout_height="350dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="300dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="24dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.72"
+        app:layout_constraintHorizontal_bias="0.833"
         app:layout_constraintLeft_toRightOf="@+id/all_right"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llo_mode">
+        app:layout_constraintTop_toBottomOf="@+id/llo_mode"
+        app:layout_constraintVertical_bias="0.3">
 
         <!--time 1-->
         <LinearLayout
@@ -654,6 +650,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:weightSum="1">
+
             <com.sciento.wumu.weidianliu.view.LongClickButton
                 android:id="@+id/btn_time_train_minus"
                 style="@style/time_controler_minus" />
@@ -694,18 +691,16 @@
         android:id="@+id/llo_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.74"
+        app:layout_constraintHorizontal_bias="0.86"
         app:layout_constraintLeft_toRightOf="@+id/progressBar"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.100000024">
+        app:layout_constraintVertical_bias="0.126">
 
         <TextView
             android:layout_width="wrap_content"
@@ -716,7 +711,7 @@
             android:textSize="15sp" />
 
         <FrameLayout
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
@@ -726,14 +721,13 @@
                 android:id="@+id/switch_aerobic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
                 app:theme="@style/Switch_control" />
+
             <TextView
                 android:id="@+id/tv_aerobic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </FrameLayout>
-
 
 
         <TextView
@@ -745,7 +739,7 @@
             android:textSize="15sp" />
 
         <FrameLayout
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
@@ -756,6 +750,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:theme="@style/Switch_control" />
+
             <TextView
                 android:id="@+id/tv_anoxic"
                 android:layout_width="match_parent"
@@ -772,7 +767,7 @@
             android:textSize="15sp" />
 
         <FrameLayout
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
@@ -782,14 +777,13 @@
                 android:id="@+id/switch_massage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:theme="@style/Switch_control"
-                />
+                app:theme="@style/Switch_control" />
+
             <TextView
                 android:id="@+id/tv_massage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </FrameLayout>
-
 
 
     </LinearLayout>
@@ -827,8 +821,8 @@
 
     <Button
         android:id="@+id/btn_start"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"

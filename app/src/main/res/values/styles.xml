@@ -32,24 +32,24 @@
 
     
     <style name="imagebuttonstyle_left_minus">
-        <item name="android:layout_height">50dp</item>
-        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">30dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/left_subtract</item>
-        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:layout_marginRight">12dp</item>
     </style>
 
     <style name="imagebuttonstyle_left_add">
-        <item name="android:layout_height">50dp</item>
-        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">30dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/left_add</item>
-        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginLeft">12dp</item>
     </style>
 
     <style name="circleprogress">
-        <item name="android:layout_width">60dp</item>
-        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
     </style>
 
 
@@ -72,8 +72,8 @@
     </style>
 
     <style name="time_show">
-        <item name="android:layout_width">80dp</item>
-        <item name="android:layout_height">80dp</item>
+        <item name="android:layout_width">65dp</item>
+        <item name="android:layout_height">65dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:text">0</item>
         <item name="android:textSize">15sp</item>
@@ -83,7 +83,7 @@
 
     <style name="Switch_control" parent="Theme.AppCompat.Light" >
         <!-- active thumb & track color (30% transparency) -->
-        <item name="colorControlActivated">@color/circleprocolor</item>
+        <item name="colorControlActivated">@color/circle_pro_color</item>
         <item name="colorSwitchThumbNormal">#cccccc</item>
     </style>
 
